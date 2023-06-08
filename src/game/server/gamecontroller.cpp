@@ -46,6 +46,7 @@ IGameController::IGameController(class CGameContext *pGameServer)
 
 	if(IsTeamplay())
 	{
+		dbg_msg("bng", "reset scores");
 		m_aTeamscore[TEAM_RED] = m_aTeamscore[TEAM_BLUE] = 0;
 	}
 }
@@ -511,6 +512,8 @@ void IGameController::ChangeMap(const char *pToMap)
 
 void IGameController::OnReset()
 {
+	m_aTeamscore[0] = 0;
+    m_aTeamscore[1] = 0;
 	for(auto &pPlayer : GameServer()->m_apPlayers)
 		if(pPlayer)
 			pPlayer->Respawn();
