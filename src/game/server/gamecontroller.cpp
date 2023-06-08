@@ -494,6 +494,8 @@ void IGameController::StartRound()
 	m_RoundStartTick = Server()->Tick();
 	m_SuddenDeath = 0;
 	m_GameOverTick = -1;
+	m_aTeamscore[0] = 0;
+	m_aTeamscore[1] = 0;
 	GameServer()->m_World.m_Paused = false;
 	m_ForceBalanced = false;
 	Server()->DemoRecorder_HandleAutoStart();
