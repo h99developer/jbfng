@@ -8,8 +8,6 @@
 
 class CGameTeams;
 class CGameWorld;
-class IAntibot;
-struct CAntibotCharacterData;
 
 enum
 {
@@ -158,7 +156,6 @@ private:
 	void HandleBroadcast();
 	void HandleTuneLayer();
 	void SendZoneMsgs();
-	IAntibot *Antibot();
 
 	bool m_SetSavePos;
 	CSaveTee m_RescueTee;
@@ -168,7 +165,6 @@ public:
 	void SetTeams(CGameTeams *pTeams);
 	void SetTeleports(std::map<int, std::vector<vec2>> *pTeleOuts, std::map<int, std::vector<vec2>> *pTeleCheckOuts);
 
-	void FillAntibot(CAntibotCharacterData *pData);
 	void Pause(bool Pause);
 	bool Freeze(int Seconds);
 	bool Freeze();

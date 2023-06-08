@@ -321,8 +321,6 @@ public:
 	virtual void OnClientEngineJoin(int ClientID, bool Sixup) = 0;
 	virtual void OnClientEngineDrop(int ClientID, const char *pReason) = 0;
 
-	virtual void FillAntibot(CAntibotRoundData *pData) = 0;
-
 	/**
 	 * Used to report custom player info to master servers.
 	 * 

@@ -923,11 +923,6 @@ void CGameTeams::SwapTeamCharacters(CPlayer *pPrimaryPlayer, CPlayer *pTargetPla
 
 	GameServer()->m_World.SwapClients(pPrimaryPlayer->GetCID(), pTargetPlayer->GetCID());
 
-	if(GameServer()->TeeHistorianActive())
-	{
-		GameServer()->TeeHistorian()->RecordPlayerSwap(pPrimaryPlayer->GetCID(), pTargetPlayer->GetCID());
-	}
-
 	str_format(aBuf, sizeof(aBuf),
 		"%s has swapped with %s.",
 		Server()->ClientName(pPrimaryPlayer->GetCID()), Server()->ClientName(pTargetPlayer->GetCID()));
@@ -949,13 +944,6 @@ void CGameTeams::ProcessSaveTeam()
 		{
 		case CScoreSaveResult::SAVE_SUCCESS:
 		{
-			if(GameServer()->TeeHistorianActive())
-			{
-				GameServer()->TeeHistorian()->RecordTeamSaveSuccess(
-					Team,
-					m_apSaveTeamResult[Team]->m_SaveID,
-					m_apSaveTeamResult[Team]->m_SavedTeam.GetString());
-			}
 			for(int i = 0; i < m_apSaveTeamResult[Team]->m_SavedTeam.GetMembersCount(); i++)
 			{
 				if(m_apSaveTeamResult[Team]->m_SavedTeam.m_pSavedTees->IsHooking())
@@ -972,8 +960,6 @@ void CGameTeams::ProcessSaveTeam()
 			break;
 		}
 		case CScoreSaveResult::SAVE_FAILED:
-			if(GameServer()->TeeHistorianActive())
-				GameServer()->TeeHistorian()->RecordTeamSaveFailure(Team);
 			if(Count(Team) > 0)
 			{
 				// load weak/strong order to prevent switching weak/strong while saving
@@ -982,13 +968,6 @@ void CGameTeams::ProcessSaveTeam()
 			break;
 		case CScoreSaveResult::LOAD_SUCCESS:
 		{
-			if(GameServer()->TeeHistorianActive())
-			{
-				GameServer()->TeeHistorian()->RecordTeamLoadSuccess(
-					Team,
-					m_apSaveTeamResult[Team]->m_SaveID,
-					m_apSaveTeamResult[Team]->m_SavedTeam.GetString());
-			}
 			if(Count(Team) > 0)
 			{
 				// keep current weak/strong order as on some maps there is no other way of switching
@@ -1000,8 +979,6 @@ void CGameTeams::ProcessSaveTeam()
 			break;
 		}
 		case CScoreSaveResult::LOAD_FAILED:
-			if(GameServer()->TeeHistorianActive())
-				GameServer()->TeeHistorian()->RecordTeamLoadFailure(Team);
 			if(m_apSaveTeamResult[Team]->m_aMessage[0] != '\0')
 				GameServer()->SendChatTarget(m_apSaveTeamResult[Team]->m_RequestingPlayer, m_apSaveTeamResult[Team]->m_aMessage);
 			break;

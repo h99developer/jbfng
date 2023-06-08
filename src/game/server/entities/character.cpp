@@ -4,9 +4,6 @@
 #include "laser.h"
 #include "projectile.h"
 
-#include <antibot/antibot_data.h>
-
-#include <engine/antibot.h>
 #include <engine/shared/config.h>
 
 #include <game/generated/protocol.h>
@@ -73,7 +70,6 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_NumInputs = 0;
 	m_SpawnTick = Server()->Tick();
 	m_WeaponChangeTick = Server()->Tick();
-	Antibot()->OnSpawn(m_pPlayer->GetCID());
 
 	m_Core.Reset();
 	m_Core.Init(&GameServer()->m_World.m_Core, Collision());
@@ -379,13 +375,7 @@ void CCharacter::HandleWeaponSwitch()
 void CCharacter::FireWeapon()
 {
 	if(m_ReloadTimer != 0)
-	{
-		if(m_LatestInput.m_Fire & 1)
-		{
-			Antibot()->OnHammerFireReloading(m_pPlayer->GetCID());
-		}
 		return;
-	}
 
 	DoWeaponSwitch();
 	vec2 Direction = normalize(vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY));
@@ -440,8 +430,6 @@ void CCharacter::FireWeapon()
 		m_NumObjectsHit = 0;
 		GameServer()->CreateSound(m_Pos, SOUND_HAMMER_FIRE, TeamMask());
 
-		Antibot()->OnHammerFire(m_pPlayer->GetCID());
-
 		if(m_Core.m_HammerHitDisabled)
 			break;
 
@@ -485,8 +473,6 @@ void CCharacter::FireWeapon()
 
 			if(m_FreezeHammer)
 				pTarget->Freeze();
-
-			Antibot()->OnHammerHit(m_pPlayer->GetCID(), pTarget->GetPlayer()->GetCID());
 
 			Hits++;
 		}
@@ -709,8 +695,6 @@ void CCharacter::OnDirectInput(CNetObj_PlayerInput *pNewInput)
 	if(m_LatestInput.m_TargetX == 0 && m_LatestInput.m_TargetY == 0)
 		m_LatestInput.m_TargetY = -1;
 
-	Antibot()->OnDirectInput(m_pPlayer->GetCID());
-
 	if(m_NumInputs > 1 && m_pPlayer->GetTeam() != TEAM_SPECTATORS)
 	{
 		HandleWeaponSwitch();
@@ -763,8 +747,6 @@ void CCharacter::PreTick()
 
 	DDRaceTick();
 
-	Antibot()->OnCharacterTick(m_pPlayer->GetCID());
-
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true, !g_Config.m_SvNoWeakHook);
 }
@@ -783,23 +765,10 @@ void CCharacter::Tick()
 		PreTick();
 	}
 
-	if(!m_PrevInput.m_Hook && m_Input.m_Hook && !(m_Core.m_TriggeredEvents & COREEVENT_HOOK_ATTACH_PLAYER))
-	{
-		Antibot()->OnHookAttach(m_pPlayer->GetCID(), false);
-	}
-
 	// handle Weapons
 	HandleWeapons();
 
 	DDRacePostCoreTick();
-
-	if(m_Core.m_TriggeredEvents & COREEVENT_HOOK_ATTACH_PLAYER)
-	{
-		if(m_Core.m_HookedPlayer != -1 && GameServer()->m_apPlayers[m_Core.m_HookedPlayer]->GetTeam() != TEAM_SPECTATORS)
-		{
-			Antibot()->OnHookAttach(m_pPlayer->GetCID(), true);
-		}
-	}
 
 	// Previnput
 	m_PrevInput = m_Input;
@@ -1249,22 +1218,6 @@ void CCharacter::SetTeleports(std::map<int, std::vector<vec2>> *pTeleOuts, std::
 	m_pTeleOuts = pTeleOuts;
 	m_pTeleCheckOuts = pTeleCheckOuts;
 	m_Core.m_pTeleOuts = pTeleOuts;
-}
-
-void CCharacter::FillAntibot(CAntibotCharacterData *pData)
-{
-	pData->m_Pos = m_Pos;
-	pData->m_Vel = m_Core.m_Vel;
-	pData->m_Angle = m_Core.m_Angle;
-	pData->m_HookedPlayer = m_Core.m_HookedPlayer;
-	pData->m_SpawnTick = m_SpawnTick;
-	pData->m_WeaponChangeTick = m_WeaponChangeTick;
-	pData->m_aLatestInputs[0].m_TargetX = m_LatestInput.m_TargetX;
-	pData->m_aLatestInputs[0].m_TargetY = m_LatestInput.m_TargetY;
-	pData->m_aLatestInputs[1].m_TargetX = m_LatestPrevInput.m_TargetX;
-	pData->m_aLatestInputs[1].m_TargetY = m_LatestPrevInput.m_TargetY;
-	pData->m_aLatestInputs[2].m_TargetX = m_LatestPrevPrevInput.m_TargetX;
-	pData->m_aLatestInputs[2].m_TargetY = m_LatestPrevPrevInput.m_TargetY;
 }
 
 void CCharacter::HandleBroadcast()
@@ -1983,11 +1936,6 @@ void CCharacter::SendZoneMsgs()
 		}
 		GameServer()->SendChatTarget(m_pPlayer->GetCID(), pCur);
 	}
-}
-
-IAntibot *CCharacter::Antibot()
-{
-	return GameServer()->Antibot();
 }
 
 void CCharacter::SetTeams(CGameTeams *pTeams)

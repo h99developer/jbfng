@@ -21,7 +21,6 @@
 #include <memory>
 #include <vector>
 
-#include "antibot.h"
 #include "authmanager.h"
 #include "name_ban.h"
 
@@ -105,7 +104,6 @@ class CServer : public IServer
 	class CConfig *m_pConfig;
 	class IConsole *m_pConsole;
 	class IStorage *m_pStorage;
-	class IEngineAntibot *m_pAntibot;
 	class IRegister *m_pRegister;
 
 #if defined(CONF_UPNP)
@@ -126,7 +124,6 @@ public:
 	const CConfig *Config() const { return m_pConfig; }
 	class IConsole *Console() { return m_pConsole; }
 	class IStorage *Storage() { return m_pStorage; }
-	class IEngineAntibot *Antibot() { return m_pAntibot; }
 	class CDbConnectionPool *DbPool() { return m_pConnectionPool; }
 
 	enum

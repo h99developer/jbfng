@@ -52,7 +52,6 @@ class CHeap;
 class CPlayer;
 class CScore;
 class CUnpacker;
-class IAntibot;
 class IGameController;
 class IEngine;
 class IStorage;
@@ -66,7 +65,6 @@ class CGameContext : public IGameServer
 	IConsole *m_pConsole;
 	IEngine *m_pEngine;
 	IStorage *m_pStorage;
-	IAntibot *m_pAntibot;
 	CLayers m_Layers;
 	CCollision m_Collision;
 	protocol7::CNetObjHandler m_NetObjHandler7;
@@ -139,8 +137,6 @@ public:
 	CCollision *Collision() { return &m_Collision; }
 	CTuningParams *Tuning() { return &m_Tuning; }
 	CTuningParams *TuningList() { return &m_aTuningList[0]; }
-	IAntibot *Antibot() { return m_pAntibot; }
-	CTeeHistorian *TeeHistorian() { return &m_TeeHistorian; }
 	bool TeeHistorianActive() const { return m_TeeHistorianActive; }
 
 	CGameContext();
@@ -289,7 +285,6 @@ public:
 	// DDRace
 	void OnPreTickTeehistorian() override;
 	bool OnClientDDNetVersionKnown(int ClientID);
-	void FillAntibot(CAntibotRoundData *pData) override;
 	bool ProcessSpamProtection(int ClientID, bool RespectChatInitialDelay = true);
 	int GetDDRaceTeam(int ClientID);
 	// Describes the time when the first player joined the server.
