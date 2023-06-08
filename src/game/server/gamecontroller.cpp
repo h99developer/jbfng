@@ -474,9 +474,9 @@ const char *IGameController::GetTeamName(int Team)
 	if(IsTeamplay())
 	{
 		if(Team == TEAM_RED)
-			return "red Team";
+			return "red";
 		else if(Team == TEAM_BLUE)
-			return "blue Team";
+			return "blue";
 	}
 	else
 	{
