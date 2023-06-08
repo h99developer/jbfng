@@ -132,7 +132,7 @@ void CGameControllerDDRace::OnPlayerConnect(CPlayer *pPlayer)
 
 	// Can't set score here as LoadScore() is threaded, run it in
 	// LoadScoreThreaded() instead
-	Score()->LoadPlayerData(ClientID);
+	//Score()->LoadPlayerData(ClientID);
 }
 
 void CGameControllerDDRace::OnPlayerDisconnect(CPlayer *pPlayer, const char *pReason)
