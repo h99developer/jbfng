@@ -8,7 +8,6 @@
 
 #include <base/system.h>
 
-#include <engine/antibot.h>
 #include <engine/server.h>
 #include <engine/shared/config.h>
 
@@ -31,12 +30,10 @@ CPlayer::CPlayer(CGameContext *pGameServer, uint32_t UniqueClientID, int ClientI
 	m_ScoreStartTick = Server()->Tick();
 
 	Reset();
-	GameServer()->Antibot()->OnPlayerInit(m_ClientID);
 }
 
 CPlayer::~CPlayer()
 {
-	GameServer()->Antibot()->OnPlayerDestroy(m_ClientID);
 	delete m_pLastTarget;
 	delete m_pCharacter;
 	m_pCharacter = 0;

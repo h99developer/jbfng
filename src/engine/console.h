@@ -12,7 +12,6 @@
 static const ColorRGBA gs_ConsoleDefaultColor(1, 1, 1, 1);
 
 enum LEVEL : char;
-struct CChecksumData;
 
 class IConsole : public IInterface
 {
@@ -115,7 +114,6 @@ public:
 	virtual void Print(int Level, const char *pFrom, const char *pStr, ColorRGBA PrintColor = gs_ConsoleDefaultColor) const = 0;
 	virtual void SetTeeHistorianCommandCallback(FTeeHistorianCommandCallback pfnCallback, void *pUser) = 0;
 	virtual void SetUnknownCommandCallback(FUnknownCommandCallback pfnCallback, void *pUser) = 0;
-	virtual void InitChecksum(CChecksumData *pData) const = 0;
 
 	virtual void SetAccessLevel(int AccessLevel) = 0;
 

@@ -3,7 +3,6 @@
 #include "linereader.h"
 #include <base/math.h>
 #include <base/system.h>
-#include <engine/client/updater.h>
 #include <engine/storage.h>
 
 #ifdef CONF_PLATFORM_HAIKU
@@ -276,37 +275,6 @@ public:
 		str_copy(m_aBinarydir, BINARY_DIR, sizeof(m_aBinarydir));
 		return;
 #endif
-
-		// check for usable path in argv[0]
-		{
-			unsigned int Pos = ~0U;
-			for(unsigned i = 0; pArgv0[i]; i++)
-				if(pArgv0[i] == '/' || pArgv0[i] == '\\')
-					Pos = i;
-
-			if(Pos < IO_MAX_PATH_LENGTH)
-			{
-				char aBuf[IO_MAX_PATH_LENGTH];
-				str_copy(m_aBinarydir, pArgv0, Pos + 1);
-				str_format(aBuf, sizeof(aBuf), "%s/" PLAT_SERVER_EXEC, m_aBinarydir);
-				IOHANDLE File = io_open(aBuf, IOFLAG_READ);
-				if(File)
-				{
-					io_close(File);
-					return;
-				}
-#if defined(CONF_PLATFORM_MACOS)
-				str_append(m_aBinarydir, "/../../../DDNet-Server.app/Contents/MacOS", sizeof(m_aBinarydir));
-				str_format(aBuf, sizeof(aBuf), "%s/" PLAT_SERVER_EXEC, m_aBinarydir);
-				IOHANDLE FileBis = io_open(aBuf, IOFLAG_READ);
-				if(FileBis)
-				{
-					io_close(FileBis);
-					return;
-				}
-#endif
-			}
-		}
 
 		// no binary directory found, use $PATH on Posix, $PWD on Windows
 		m_aBinarydir[0] = '\0';

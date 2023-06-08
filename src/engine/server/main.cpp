@@ -10,7 +10,6 @@
 #include <engine/server.h>
 #include <engine/storage.h>
 
-#include <engine/server/antibot.h>
 #include <engine/server/databases/connection.h>
 #include <engine/server/server.h>
 #include <engine/server/server_logger.h>
@@ -111,7 +110,6 @@ int main(int argc, const char **argv)
 	IConsole *pConsole = CreateConsole(CFGFLAG_SERVER | CFGFLAG_ECON).release();
 	IStorage *pStorage = CreateStorage(IStorage::STORAGETYPE_SERVER, argc, argv);
 	IConfigManager *pConfigManager = CreateConfigManager();
-	IEngineAntibot *pEngineAntibot = CreateEngineAntibot();
 
 	pFutureAssertionLogger->Set(CreateAssertionLogger(pStorage, GAME_NAME));
 #if defined(CONF_EXCEPTION_HANDLING)
@@ -135,8 +133,6 @@ int main(int argc, const char **argv)
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConsole);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pStorage);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConfigManager);
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pEngineAntibot);
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IAntibot *>(pEngineAntibot), false);
 
 		if(RegisterFail)
 		{

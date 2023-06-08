@@ -366,9 +366,6 @@ void RegisterGameUuids(CUuidManager *pManager)
 
 
 def gen_common_content_header():
-	# print some includes
-	print('#include <engine/graphics.h>')
-
 	# emit the type declarations
 	with open("datasrc/content.py", "rb") as content_file:
 		contentlines = content_file.readlines()
@@ -383,25 +380,9 @@ def gen_common_content_header():
 	# the container pointer
 	print('extern CDataContainer *g_pData;')
 
-	# enums
-	EmitEnum([f"IMAGE_{i.name.value.upper()}" for i in content.container.images.items], "NUM_IMAGES")
-	EmitEnum([f"ANIM_{i.name.value.upper()}" for i in content.container.animations.items], "NUM_ANIMS")
-	EmitEnum([f"SPRITE_{i.name.value.upper()}" for i in content.container.sprites.items], "NUM_SPRITES")
-
 def gen_common_content_source():
 	EmitDefinition(content.container, "datacontainer")
 	print('CDataContainer *g_pData = &datacontainer;')
-
-def gen_client_content_header():
-	print("#ifndef CLIENT_CONTENT_HEADER")
-	print("#define CLIENT_CONTENT_HEADER")
-	gen_common_content_header()
-	print("#endif")
-
-
-def gen_client_content_source():
-	print('#include "client_data.h"')
-	gen_common_content_source()
 
 
 def gen_server_content_header():
@@ -423,8 +404,6 @@ def main():
 	FUNCTION_MAP = {
 						'network_header': gen_network_header,
 						'network_source': gen_network_source,
-						'client_content_header': gen_client_content_header,
-						'client_content_source': gen_client_content_source,
 						'server_content_header': gen_server_content_header,
 						'server_content_source': gen_server_content_source,
 					}
