@@ -97,6 +97,10 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 
 	Server()->StartRecord(m_pPlayer->GetCID());
 
+	// bng
+	m_LastInteractTick = -1;
+	m_LastEnemyInteractor = -1;
+
 	return true;
 }
 
@@ -446,7 +450,7 @@ void CCharacter::FireWeapon()
 			if((pTarget == this || (pTarget->IsAlive() && !CanCollide(pTarget->GetPlayer()->GetCID()))))
 				continue;
 
-			// set his velocity to fast upward (for now)
+			// set his velocity to fast upward ()
 			if(length(pTarget->m_Pos - ProjStartPos) > 0.0f)
 				GameServer()->CreateHammerHit(pTarget->m_Pos - normalize(pTarget->m_Pos - ProjStartPos) * GetProximityRadius() * 0.5f, TeamMask());
 			else
@@ -469,8 +473,14 @@ void CCharacter::FireWeapon()
 			Temp -= pTarget->m_Core.m_Vel;
 			pTarget->TakeDamage((vec2(0.f, -1.0f) + Temp) * Strength, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage,
 				m_pPlayer->GetCID(), m_Core.m_ActiveWeapon);
-			pTarget->UnFreeze();
-
+			if (pTarget->GetPlayer()->GetTeam() == GetPlayer()->GetTeam())
+			{
+				if(!pTarget->Core()->m_DeepFrozen)
+					pTarget->UnFreeze();
+			} else {
+				pTarget->m_LastEnemyInteractor = GetPlayer()->GetCID();
+				pTarget->m_LastInteractTick = Server()->Tick();
+			}
 			if(m_FreezeHammer)
 				pTarget->Freeze();
 
@@ -1259,7 +1269,10 @@ void CCharacter::HandleSkippableTiles(int Index)
 		   Collision()->GetFCollisionAt(m_Pos.x - GetProximityRadius() / 3.f, m_Pos.y + GetProximityRadius() / 3.f) == TILE_DEATH) &&
 		!m_Core.m_Super && !(Team() && Teams()->TeeFinished(m_pPlayer->GetCID())))
 	{
-		Die(m_pPlayer->GetCID(), WEAPON_WORLD);
+		if (m_LastEnemyInteractor != -1 && m_LastInteractTick + 5 * Server()->TickSpeed() < Server()->Tick())
+			Die(m_LastEnemyInteractor, WEAPON_NINJA);
+		else
+			Die(m_pPlayer->GetCID(), WEAPON_WORLD);
 		return;
 	}
 

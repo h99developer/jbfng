@@ -1519,7 +1519,6 @@ void CGameContext::ConProtectedKill(IConsole::IResult *pResult, void *pUserData)
 	CCharacter *pChr = pPlayer->GetCharacter();
 	if(!pChr)
 		return;
-
 	// DDNet-Skeleton
 	if(!g_Config.m_SvSelfKill)
 	{

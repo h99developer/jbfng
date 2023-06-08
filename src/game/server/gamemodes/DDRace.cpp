@@ -233,3 +233,7 @@ int CGameControllerDDRace::GetPlayerTeam(int ClientID) const
 {
 	return m_Teams.m_Core.Team(ClientID);
 }
+int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct CPlayer *pKiller, int Weapon)
+{
+	return 0;
+}

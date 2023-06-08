@@ -216,6 +216,10 @@ public:
 	int m_MaxHealth;
 	int m_MaxArmor;
 
+	// bng
+	int m_LastEnemyInteractor;
+	int m_LastInteractTick;
+
 	// Setters/Getters because i don't want to modify vanilla vars access modifiers
 	int GetLastWeapon() { return m_LastWeapon; }
 	void SetLastWeapon(int LastWeap) { m_LastWeapon = LastWeap; }

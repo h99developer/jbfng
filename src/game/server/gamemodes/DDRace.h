@@ -28,6 +28,7 @@ public:
 	void Tick() override;
 
 	void DoTeamChange(class CPlayer *pPlayer, int Team, bool DoChatMsg = true) override;
+	int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon) override;
 
 	int64_t GetMaskForPlayerWorldEvent(int Asker, int ExceptID = -1) override;
 
