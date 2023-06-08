@@ -2319,7 +2319,7 @@ void CCharacter::EndSpree(int Killer)
 		char aBuf[128];
 		if (Killer != GetPlayer()->GetCID())
 		{
-			str_format(aBuf, sizeof(aBuf), "'%s' ended '%s' spree of %d kills!", Server()->ClientName(Killer), m_Spree, Server()->ClientName(GetPlayer()->GetCID()));
+			str_format(aBuf, sizeof(aBuf), "'%s' ended '%s' spree of %d kills!", Server()->ClientName(Killer), Server()->ClientName(GetPlayer()->GetCID()), m_Spree);
 			GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf, -1, CGameContext::CHAT_SIX);
 		}
 		else
