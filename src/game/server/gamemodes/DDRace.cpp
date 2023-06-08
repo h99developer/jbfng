@@ -235,5 +235,19 @@ int CGameControllerDDRace::GetPlayerTeam(int ClientID) const
 }
 int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct CPlayer *pKiller, int Weapon)
 {
+	if (Weapon == WEAPON_WORLD || Weapon == WEAPON_NINJA)
+	{
+		int points = pVictim->GetCore().m_DeepFrozen ? 10 : 5;
+		if (pVictim->Team() == TEAM_RED)
+			m_aTeamscore[TEAM_BLUE] += points;
+		else
+			m_aTeamscore[TEAM_RED] += points;
+		if (pVictim->GetPlayer()->GetCID() != pKiller->GetCID())
+		{
+			pKiller->m_Score += points / 5;
+		}
+		else
+			pKiller->m_Score--;
+	}
 	return 0;
 }
