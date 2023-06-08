@@ -238,8 +238,7 @@ int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct C
 	if (Weapon == WEAPON_WORLD || Weapon == WEAPON_NINJA)
 	{
 		int points = pVictim->GetCore().m_DeepFrozen ? 10 : 5;
-		dbg_msg("bng", "victim team: %d", pVictim->Team());
-		if (pVictim->Team() == TEAM_RED)
+		if (pVictim->GetPlayer()->GetTeam() == TEAM_RED)
 			m_aTeamscore[TEAM_BLUE] += points;
 		else
 			m_aTeamscore[TEAM_RED] += points;
