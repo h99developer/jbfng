@@ -348,7 +348,7 @@ void CPlayer::Snap(int SnappingClient)
 
 	// send 0 if times of others are not shown
 	if(SnappingClient != m_ClientID && g_Config.m_SvHideScore)
-		Score = -9999;
+		Score = 0;
 
 	if(!Server()->IsSixup(SnappingClient))
 	{
@@ -479,7 +479,7 @@ void CPlayer::FakeSnap()
 	pPlayerInfo->m_Latency = m_Latency.m_Min;
 	pPlayerInfo->m_Local = 1;
 	pPlayerInfo->m_ClientID = FakeID;
-	pPlayerInfo->m_Score = -9999;
+	pPlayerInfo->m_Score = 0;
 	pPlayerInfo->m_Team = TEAM_SPECTATORS;
 
 	CNetObj_SpectatorInfo *pSpectatorInfo = static_cast<CNetObj_SpectatorInfo *>(Server()->SnapNewItem(NETOBJTYPE_SPECTATORINFO, FakeID, sizeof(CNetObj_SpectatorInfo)));
