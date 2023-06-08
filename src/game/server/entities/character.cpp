@@ -1269,7 +1269,7 @@ void CCharacter::HandleSkippableTiles(int Index)
 		   Collision()->GetFCollisionAt(m_Pos.x - GetProximityRadius() / 3.f, m_Pos.y + GetProximityRadius() / 3.f) == TILE_DEATH) &&
 		!m_Core.m_Super && !(Team() && Teams()->TeeFinished(m_pPlayer->GetCID())))
 	{
-		if (m_LastEnemyInteractor != -1 && m_LastInteractTick + 5 * Server()->TickSpeed() < Server()->Tick())
+		if (m_LastEnemyInteractor != -1 && m_LastInteractTick + 5 * Server()->TickSpeed() >= Server()->Tick())
 			Die(m_LastEnemyInteractor, WEAPON_NINJA);
 		else
 			Die(m_pPlayer->GetCID(), WEAPON_WORLD);
