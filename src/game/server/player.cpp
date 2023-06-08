@@ -123,7 +123,7 @@ void CPlayer::Reset()
 	m_DND = false;
 
 	m_LastPause = 0;
-	m_Score = -9999;
+	m_Score = 0;
 	m_HasFinishScore = false;
 
 	// Variable initialized:
