@@ -27,7 +27,7 @@ CCharacter::CCharacter(CGameWorld *pWorld, CNetObj_PlayerInput LastInput) :
 	m_MaxHealth = 10;
 	m_MaxArmor = 10;
 	m_StrongWeakID = 0;
-
+	m_Spree = 0;
 	m_Input = LastInput;
 	// never initialize both to zero
 	m_Input.m_TargetX = 0;
@@ -2301,4 +2301,32 @@ int64_t CCharacter::TeamMask()
 void CCharacter::SwapClients(int Client1, int Client2)
 {
 	m_Core.SetHookedPlayer(m_Core.m_HookedPlayer == Client1 ? Client2 : m_Core.m_HookedPlayer == Client2 ? Client1 : m_Core.m_HookedPlayer);
+}
+void CCharacter::AddSpree()
+{
+	m_Spree++;
+	if (m_Spree % 5 == 0)
+	{
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "'%s' is on a spree of %d kills!", Server()->ClientName(GetPlayer()->GetCID()), m_Spree);
+		GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf, -1, CGameContext::CHAT_SIX);
+	}
+}
+void CCharacter::EndSpree(int Killer)
+{
+	if (m_Spree >= 5)
+	{
+		char aBuf[128];
+		if (Killer != GetPlayer()->GetCID())
+		{
+			str_format(aBuf, sizeof(aBuf), "'%s' ended '%s' spree of %d kills!", Server()->ClientName(Killer), m_Spree, Server()->ClientName(GetPlayer()->GetCID()));
+			GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf, -1, CGameContext::CHAT_SIX);
+		}
+		else
+		{
+			str_format(aBuf, sizeof(aBuf), "'%s' lost his spree of %d kills", Server()->ClientName(Killer), m_Spree);
+			GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf, -1, CGameContext::CHAT_SIX);
+		}
+	}
+	m_Spree = 0;
 }

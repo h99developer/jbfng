@@ -245,9 +245,14 @@ int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct C
 		if (pVictim->GetPlayer()->GetCID() != pKiller->GetCID())
 		{
 			pKiller->m_Score += points / 5;
+			if(pKiller->GetCharacter())
+			{
+				pKiller->GetCharacter()->AddSpree();
+			}
 		}
 		else
 			pKiller->m_Score--;
+		pVictim->EndSpree(pKiller->GetCID());
 	}
 	return 0;
 }

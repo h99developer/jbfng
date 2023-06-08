@@ -219,6 +219,7 @@ public:
 	// bng
 	int m_LastEnemyInteractor;
 	int m_LastInteractTick;
+	int m_Spree;
 
 	// Setters/Getters because i don't want to modify vanilla vars access modifiers
 	int GetLastWeapon() { return m_LastWeapon; }
@@ -253,6 +254,9 @@ public:
 	bool IsSuper() { return m_Core.m_Super; }
 
 	CSaveTee &GetRescueTeeRef() { return m_RescueTee; }
+	// bng
+	void AddSpree();
+	void EndSpree(int Killer);
 };
 
 enum
