@@ -190,6 +190,10 @@ void CGameControllerDDRace::DoTeamChange(class CPlayer *pPlayer, int Team, bool 
 			m_Teams.CheckTeamFinished(DDRTeam);
 		}
 	}
+	if (pPlayer->GetCharacter() && (pPlayer->GetCharacter()->Core()->m_DeepFrozen || pPlayer->GetCharacter()->m_FreezeTime > 0))
+	{
+		return;
+	}
 
 	IGameController::DoTeamChange(pPlayer, Team, DoChatMsg);
 }
