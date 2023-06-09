@@ -256,7 +256,7 @@ int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct C
 			pKiller->m_Score -= 2;
 			GivePoints = false;
 		}
-		else
+		else if (Tile == TILE_BLUE_SPIKE  || Tile == TILE_RED_SPIKE)
 			Points += 5;
 
 		// Add team score
