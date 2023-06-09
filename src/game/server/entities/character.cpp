@@ -2360,3 +2360,7 @@ void CCharacter::EndSpree(int Killer)
 	}
 	m_Spree = 0;
 }
+void CCharacter::BNGTick()
+{
+
+}

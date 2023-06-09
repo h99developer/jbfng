@@ -258,6 +258,7 @@ public:
 	// bng
 	void AddSpree();
 	void EndSpree(int Killer);
+	void BNGTick();
 };
 
 enum
