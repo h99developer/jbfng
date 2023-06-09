@@ -252,6 +252,11 @@ int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct C
 		if((VictimTeam == TEAM_RED && Tile == TILE_RED_SPIKE) ||
 			(VictimTeam == TEAM_BLUE && Tile == TILE_BLUE_SPIKE))
 		{
+			if(pKiller->GetCharacter())
+				pKiller->GetCharacter()->Freeze(5);
+			GameServer()->SendBroadcast("Wrong spikes", pKiller->GetCID());
+			pKiller->m_Score -= 2;
+
 			GivePoints = false;
 		}
 		else
