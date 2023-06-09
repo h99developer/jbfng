@@ -259,6 +259,10 @@ public:
 	void AddSpree();
 	void EndSpree(int Killer);
 	void BNGTick();
+	bool m_IgnoreUnfreeze;
+	bool Freeze(int seconds, bool IgnoreUnfreeze);
+	bool UnFreeze(bool Force);
+	int m_TicksInFreeze;
 };
 
 enum

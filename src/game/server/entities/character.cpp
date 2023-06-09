@@ -41,6 +41,9 @@ CCharacter::CCharacter(CGameWorld *pWorld, CNetObj_PlayerInput LastInput) :
 	{
 		CurrentTimeCp = 0.0f;
 	}
+
+	m_IgnoreUnfreeze = false;
+	m_TicksInFreeze = 0;
 }
 
 void CCharacter::Reset()
@@ -475,8 +478,9 @@ void CCharacter::FireWeapon()
 				m_pPlayer->GetCID(), m_Core.m_ActiveWeapon);
 			if (pTarget->GetPlayer()->GetTeam() == GetPlayer()->GetTeam())
 			{
-				if(!pTarget->Core()->m_DeepFrozen)
-					pTarget->UnFreeze();
+				if(!pTarget->Core()->m_DeepFrozen && !pTarget->Core()->m_IsInFreeze)
+					pTarget->m_FreezeTime = std::max(1, pTarget->m_FreezeTime - Server()->TickSpeed() * 3);
+					//pTarget->UnFreeze();
 			} else {
 				pTarget->m_LastEnemyInteractor = GetPlayer()->GetCID();
 				pTarget->m_LastInteractTick = Server()->Tick();
@@ -779,6 +783,7 @@ void CCharacter::Tick()
 	HandleWeapons();
 
 	DDRacePostCoreTick();
+	BNGTick();
 
 	// Previnput
 	m_PrevInput = m_Input;
@@ -921,7 +926,8 @@ void CCharacter::Die(int Killer, int Weapon, int Tile)
 	if(Server()->IsRecording(m_pPlayer->GetCID()))
 		Server()->StopRecord(m_pPlayer->GetCID());
 
-	int ModeSpecial = GameServer()->m_pController->OnCharacterDeath(this, GameServer()->m_apPlayers[Killer], Weapon, Tile);
+	bool DontLosePoints = m_TicksInFreeze > 16 * Server()->TickSpeed();
+	int ModeSpecial = GameServer()->m_pController->OnCharacterDeath(this, GameServer()->m_apPlayers[Killer], Weapon, Tile, DontLosePoints);
 
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "kill killer='%d:%s' victim='%d:%s' weapon=%d special=%d",
@@ -1437,9 +1443,9 @@ void CCharacter::HandleTiles(int Index)
 
 	// deep freeze
 	if(((m_TileIndex == TILE_DFREEZE) || (m_TileFIndex == TILE_DFREEZE)) && !m_Core.m_Super && !m_Core.m_DeepFrozen)
-		m_Core.m_DeepFrozen = true;
-	else if(((m_TileIndex == TILE_DUNFREEZE) || (m_TileFIndex == TILE_DUNFREEZE)) && !m_Core.m_Super && m_Core.m_DeepFrozen)
-		m_Core.m_DeepFrozen = false;
+		Freeze(15, true);
+	else if(((m_TileIndex == TILE_DUNFREEZE) || (m_TileFIndex == TILE_DUNFREEZE)) && !m_Core.m_Super)// && m_Core.m_DeepFrozen)
+		UnFreeze(true);
 
 	// live freeze
 	if(((m_TileIndex == TILE_LFREEZE) || (m_TileFIndex == TILE_LFREEZE)) && !m_Core.m_Super)
@@ -2153,6 +2159,8 @@ bool CCharacter::Freeze()
 
 bool CCharacter::UnFreeze()
 {
+	if(m_IgnoreUnfreeze)
+		return false;
 	if(m_FreezeTime > 0)
 	{
 		m_Armor = m_MaxArmor;
@@ -2362,5 +2370,29 @@ void CCharacter::EndSpree(int Killer)
 }
 void CCharacter::BNGTick()
 {
-
+	if (Core()->m_IsInFreeze)
+	{
+		m_TicksInFreeze++;
+	}
+	else
+	{
+		m_TicksInFreeze = 0;
+	}
+	if (m_TicksInFreeze > 16 * Server()->TickSpeed())
+	{
+		Die(-1, WEAPON_WORLD);
+	}
+}
+bool CCharacter::Freeze(int seconds, bool IgnoreUnfreeze)
+{
+	m_IgnoreUnfreeze = IgnoreUnfreeze;
+	return Freeze(seconds);
+}
+bool CCharacter::UnFreeze(bool Force)
+{
+	if (Force)
+	{
+		m_IgnoreUnfreeze = false;
+	}
+	return UnFreeze();
 }

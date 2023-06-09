@@ -81,7 +81,7 @@ public:
 			weapon - What weapon that killed it. Can be -1 for undefined
 				weapon when switching team or player suicides.
 	*/
-	virtual int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon, int Tile = TILE_DEATH);
+	virtual int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon, int Tile = TILE_DEATH, bool Force = false);
 	/*
 		Function: OnCharacterSpawn
 			Called when a CCharacter spawns into the game world.

@@ -519,7 +519,7 @@ void IGameController::OnReset()
 			pPlayer->Respawn();
 }
 
-int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon, int Tile)
+int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon, int Tile, bool Force)
 {
 	return 0;
 }

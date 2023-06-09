@@ -237,13 +237,13 @@ int CGameControllerDDRace::GetPlayerTeam(int ClientID) const
 {
 	return m_Teams.m_Core.Team(ClientID);
 }
-int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct CPlayer *pKiller, int Weapon, int Tile)
+int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct CPlayer *pKiller, int Weapon, int Tile, bool Force)
 {
-	if (Weapon == WEAPON_WORLD || Weapon == WEAPON_NINJA)
+	if (!Force && (Weapon == WEAPON_WORLD || Weapon == WEAPON_NINJA))
 	{
 		const int VictimTeam = pVictim->GetPlayer()->GetTeam();
-		const bool VictimDeepFrozen = pVictim->Core()->m_DeepFrozen;
-		const int Points = VictimDeepFrozen ? 10 : 5;
+		const bool VictimDeepFrozen = pVictim->m_FreezeTime > 3.5 * Server()->TickSpeed();
+		int Points = VictimDeepFrozen ? 10 : 5;
 		bool GivePoints = true;
 
 		// Handle team spikes
@@ -251,6 +251,10 @@ int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct C
 			(VictimTeam == TEAM_BLUE && Tile == TILE_BLUE_SPIKE))
 		{
 			GivePoints = false;
+		}
+		else
+		{
+			Points += 5;
 		}
 
 		// Add team score
