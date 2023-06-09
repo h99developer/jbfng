@@ -518,7 +518,7 @@ void IGameController::EndRound()
 
 		for(int i = 0; i < MAX_CLIENTS; i++)
 		{
-			if(GameServer()->m_apPlayers[i] && Max > GameServer()->m_apPlayers[i]->m_TotalHooks)
+			if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->m_TotalHooks > Max)
 			{
 				Max = GameServer()->m_apPlayers[i]->m_TotalHooks;
 				Best = i;
@@ -535,7 +535,7 @@ void IGameController::EndRound()
 
 		for(int i = 0; i < MAX_CLIENTS; i++)
 		{
-			if(GameServer()->m_apPlayers[i] && Max > GameServer()->m_apPlayers[i]->m_TotalFires)
+			if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->m_TotalFires > Max)
 			{
 				Max = GameServer()->m_apPlayers[i]->m_TotalFires;
 				Best = i;
