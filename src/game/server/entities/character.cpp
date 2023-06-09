@@ -1267,8 +1267,9 @@ void CCharacter::HandleSkippableTiles(int Index)
 	// 0 - DDNet kill tile
 	// 1 - BNG red spike
 	// 2 - BNG blue spike
-	bool aKills[] = {false, false, false};
-	static const int s_aTiles[] = {TILE_DEATH, TILE_RED_SPIKE, TILE_BLUE_SPIKE};
+	// 3 - BNG gold spike
+	bool aKills[] = {false, false, false, false};
+	static const int s_aTiles[] = {TILE_DEATH, TILE_RED_SPIKE, TILE_BLUE_SPIKE, TILE_GOLD_SPIKE};
 
 	for(int i = 0; i < std::size(aKills); i++)
 	{
@@ -1289,20 +1290,19 @@ void CCharacter::HandleSkippableTiles(int Index)
 	}
 
 	// Handle kill tiles
-	if(aKills[0] || aKills[1] || aKills[2])
+	int KillTile = -1;
+
+	for(int i = 0; i < std::size(aKills); i++)
 	{
-		int KillTile;
-
-		// Get killed tile
-		for(int i = 0; i < std::size(aKills); i++)
+		if(aKills[i])
 		{
-			if(aKills[i])
-			{
-				KillTile = s_aTiles[i];
-				break;
-			}
+			KillTile = s_aTiles[i];
+			break;
 		}
+	}
 
+	if(KillTile != -1)
+	{
 		if (m_LastEnemyInteractor != -1 && GameServer()->m_apPlayers[m_LastEnemyInteractor] && m_LastInteractTick + 5 * Server()->TickSpeed() >= Server()->Tick())
 			Die(m_LastEnemyInteractor, WEAPON_NINJA, KillTile);
 		else

@@ -245,7 +245,7 @@ int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct C
 	{
 		const int VictimTeam = pVictim->GetPlayer()->GetTeam();
 		const bool VictimDeepFrozen = pVictim->m_FreezeTime > 3.5 * Server()->TickSpeed();
-		int Points = VictimDeepFrozen ? 10 : 5;
+		int Points = (VictimDeepFrozen ? 10 : 5) * ((Tile == TILE_GOLD_SPIKE) ? 2 : 1);
 		bool GivePoints = true;
 
 		// Handle team spikes
@@ -255,9 +255,7 @@ int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct C
 			GivePoints = false;
 		}
 		else
-		{
 			Points += 5;
-		}
 
 		// Add team score
 		if(GivePoints)
