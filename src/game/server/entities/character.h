@@ -5,6 +5,7 @@
 
 #include <game/server/entity.h>
 #include <game/server/save.h>
+#include <game/mapitems.h>
 
 class CGameTeams;
 class CGameWorld;
@@ -61,7 +62,7 @@ public:
 	void ResetInput();
 	void FireWeapon();
 
-	void Die(int Killer, int Weapon);
+	void Die(int Killer, int Weapon, int Tile = TILE_DEATH);
 	bool TakeDamage(vec2 Force, int Dmg, int From, int Weapon);
 
 	bool Spawn(class CPlayer *pPlayer, vec2 Pos);

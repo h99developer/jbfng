@@ -5,6 +5,7 @@
 
 #include <base/vmath.h>
 #include <engine/map.h>
+#include <game/mapitems.h>
 
 #include <vector>
 
@@ -80,7 +81,7 @@ public:
 			weapon - What weapon that killed it. Can be -1 for undefined
 				weapon when switching team or player suicides.
 	*/
-	virtual int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon);
+	virtual int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon, int Tile = TILE_DEATH);
 	/*
 		Function: OnCharacterSpawn
 			Called when a CCharacter spawns into the game world.

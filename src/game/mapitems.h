@@ -182,6 +182,9 @@ enum
 	TILE_CREDITS_8 = 159,
 	TILE_ENTITIES_OFF_1 = 190,
 	TILE_ENTITIES_OFF_2,
+	// BNG
+	TILE_RED_SPIKE = 176,
+	TILE_BLUE_SPIKE,
 	//End of higher tiles
 	//Layers
 	LAYER_GAME = 0,
