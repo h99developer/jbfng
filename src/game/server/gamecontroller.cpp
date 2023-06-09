@@ -462,6 +462,91 @@ void IGameController::EndRound()
 	GameServer()->m_World.m_Paused = true;
 	m_GameOverTick = Server()->Tick();
 	m_SuddenDeath = 0;
+
+	// Print some stats
+	GameServer()->SendChatTarget(-1, "===== YOUR STATS =====");
+
+	float MaxKD = 0.f;
+	int BestKD = -1;
+	float MaxHammerAcc = 0.f;
+	int BestHammerAcc = -1;
+	const int TrivaType = rand() % 2;
+	char aBuf[256];
+
+	// Print personal stats
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		CPlayer *pPly = GameServer()->m_apPlayers[i];
+		if (!pPly)
+			continue;
+
+		const float KD = (float)pPly->m_Kills / (float)pPly->m_Deaths;
+		if(KD > MaxKD)
+		{
+			MaxKD = KD;
+			BestKD = i;
+		}
+
+		const float HammerAcc = (float)pPly->m_HammerHittedFires / (float)pPly->m_HammerFires;
+		if(HammerAcc > MaxHammerAcc)
+		{
+			MaxHammerAcc = HammerAcc;
+			BestHammerAcc = i;
+		}
+
+		str_format(aBuf, sizeof(aBuf), "K/D: %.2f", KD);
+		GameServer()->SendChatTarget(i, aBuf);
+		str_format(aBuf, sizeof(aBuf), "Kills: %d", pPly->m_Kills);
+		GameServer()->SendChatTarget(i, aBuf);
+		str_format(aBuf, sizeof(aBuf), "Deaths: %d", pPly->m_Deaths);
+		GameServer()->SendChatTarget(i, aBuf);
+		str_format(aBuf, sizeof(aBuf), "Hammer accuracy: %.2f", HammerAcc);
+		GameServer()->SendChatTarget(i, aBuf);
+	}
+
+	GameServer()->SendChatTarget(-1, "===== ROUND STATS =====");
+
+	str_format(aBuf, sizeof(aBuf), "Best K/D: %.2f (%s)", MaxKD, Server()->ClientName(BestKD));
+	GameServer()->SendChatTarget(-1, aBuf);
+	str_format(aBuf, sizeof(aBuf), "Best hammer accuracy: %.2f (%s)", MaxHammerAcc, Server()->ClientName(BestKD));
+	GameServer()->SendChatTarget(-1, aBuf);
+
+	if(TrivaType == 0)
+	{
+		int Max = 0;
+		int Best = -1;
+
+		for(int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if(GameServer()->m_apPlayers[i] && Max > GameServer()->m_apPlayers[i]->m_TotalHooks)
+			{
+				Max = GameServer()->m_apPlayers[i]->m_TotalHooks;
+				Best = i;
+			}
+		}
+
+		str_format(aBuf, sizeof(aBuf), "Triva: '%s' hooked %d times", Server()->ClientName(Best), Max);
+		GameServer()->SendChatTarget(-1, aBuf);
+	}
+	else if(TrivaType == 1)
+	{
+		int Max = 0;
+		int Best = -1;
+
+		for(int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if(GameServer()->m_apPlayers[i] && Max > GameServer()->m_apPlayers[i]->m_TotalFires)
+			{
+				Max = GameServer()->m_apPlayers[i]->m_TotalFires;
+				Best = i;
+			}
+		}
+
+		str_format(aBuf, sizeof(aBuf), "Triva: '%s' fired %d times", Server()->ClientName(Best), Max);
+		GameServer()->SendChatTarget(-1, aBuf);
+	}
+
+	GameServer()->SendChatTarget(-1, "================");
 }
 
 void IGameController::ResetGame()
