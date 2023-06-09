@@ -19,6 +19,7 @@ CGameControllerDDRace::CGameControllerDDRace(class CGameContext *pGameServer) :
 {
 	m_pGameType = g_Config.m_SvTestingCommands ? TEST_TYPE_NAME : GAME_TYPE_NAME;
 	m_GameFlags = GAMEFLAG_TEAMS;
+	m_aTeamscore[0] = m_aTeamscore[1] = 0;
 	InitTeleporter();
 }
 
@@ -151,6 +152,7 @@ void CGameControllerDDRace::OnPlayerDisconnect(CPlayer *pPlayer, const char *pRe
 
 void CGameControllerDDRace::OnReset()
 {
+	m_aTeamscore[0] = m_aTeamscore[1] = 0;
 	IGameController::OnReset();
 	m_Teams.Reset();
 }
