@@ -2394,7 +2394,7 @@ void CCharacter::BNGTick()
 		m_TicksInFreeze = 0;
 
 	if (m_TicksInFreeze > 16 * Server()->TickSpeed())
-		Die(-1, WEAPON_WORLD);
+		Die(m_pPlayer->GetCID(), WEAPON_WORLD);
 
 	// set interactor of hooked player to ourselves
 	int HookedPlayer = Core()->m_HookedPlayer;
