@@ -146,6 +146,13 @@ void CPlayer::Reset()
 	m_VotedForPractice = false;
 	m_SwapTargetsClientID = -1;
 	m_BirthdayAnnounced = false;
+
+	m_TotalFires = 0;
+	m_TotalHooks = 0;
+	m_Kills = 0;
+	m_Deaths = 0;
+	m_HammerFires = 0;
+	m_HammerHittedFires = 0;
 }
 
 static int PlayerFlags_SixToSeven(int Flags)

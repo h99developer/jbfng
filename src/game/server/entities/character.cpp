@@ -429,6 +429,8 @@ void CCharacter::FireWeapon()
 
 	vec2 ProjStartPos = m_Pos + Direction * GetProximityRadius() * 0.75f;
 
+	m_pPlayer->m_TotalFires++;
+
 	switch(m_Core.m_ActiveWeapon)
 	{
 	case WEAPON_HAMMER:
@@ -491,9 +493,13 @@ void CCharacter::FireWeapon()
 			Hits++;
 		}
 
+		m_pPlayer->m_HammerFires++;
+
 		// if we Hit anything, we have to wait for the reload
 		if(Hits)
 		{
+			m_pPlayer->m_HammerHittedFires++;
+
 			float FireDelay;
 			if(!m_TuneZone)
 				FireDelay = GameServer()->Tuning()->m_HammerHitFireDelay;
@@ -926,8 +932,13 @@ void CCharacter::Die(int Killer, int Weapon, int Tile)
 	if(Server()->IsRecording(m_pPlayer->GetCID()))
 		Server()->StopRecord(m_pPlayer->GetCID());
 
-	bool DontLosePoints = m_TicksInFreeze > 16 * Server()->TickSpeed();
-	int ModeSpecial = GameServer()->m_pController->OnCharacterDeath(this, GameServer()->m_apPlayers[Killer], Weapon, Tile, DontLosePoints);
+	CPlayer *pKiller = GameServer()->m_apPlayers[Killer];
+	const bool DontLosePoints = m_TicksInFreeze > 16 * Server()->TickSpeed();
+	int ModeSpecial = GameServer()->m_pController->OnCharacterDeath(this, pKiller, Weapon, Tile, DontLosePoints);
+
+	if(Killer != m_pPlayer->GetCID())
+		pKiller->m_Kills++;
+	m_pPlayer->m_Deaths++;
 
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "kill killer='%d:%s' victim='%d:%s' weapon=%d special=%d",
@@ -2340,9 +2351,11 @@ void CCharacter::SwapClients(int Client1, int Client2)
 {
 	m_Core.SetHookedPlayer(m_Core.m_HookedPlayer == Client1 ? Client2 : m_Core.m_HookedPlayer == Client2 ? Client1 : m_Core.m_HookedPlayer);
 }
+
 void CCharacter::AddSpree()
 {
 	m_Spree++;
+
 	if (m_Spree % 5 == 0)
 	{
 		char aBuf[128];
@@ -2350,11 +2363,13 @@ void CCharacter::AddSpree()
 		GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf, -1, CGameContext::CHAT_SIX);
 	}
 }
+
 void CCharacter::EndSpree(int Killer)
 {
 	if (m_Spree >= 5)
 	{
 		char aBuf[128];
+
 		if (Killer != GetPlayer()->GetCID())
 		{
 			str_format(aBuf, sizeof(aBuf), "'%s' ended '%s' spree of %d kills!", Server()->ClientName(Killer), Server()->ClientName(GetPlayer()->GetCID()), m_Spree);
@@ -2366,41 +2381,47 @@ void CCharacter::EndSpree(int Killer)
 			GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf, -1, CGameContext::CHAT_SIX);
 		}
 	}
+
 	m_Spree = 0;
 }
+
 void CCharacter::BNGTick()
 {
 	// handle killing tees that are in a freeze for too long
 	if (Core()->m_IsInFreeze)
-	{
 		m_TicksInFreeze++;
-	}
 	else
-	{
 		m_TicksInFreeze = 0;
-	}
+
 	if (m_TicksInFreeze > 16 * Server()->TickSpeed())
-	{
-		Die(-1, WEAPON_WORLD);
-	}
+		Die(m_pPlayer->GetCID(), WEAPON_WORLD);
+
 	// set interactor of hooked player to ourselves
 	int HookedPlayer = Core()->m_HookedPlayer;
 	CCharacter *HookedChar = GameServer()->GetPlayerChar(HookedPlayer);
-	if (HookedChar && HookedChar->GetPlayer()->GetTeam() != GetPlayer()->GetTeam() && Core()->m_HookTick > Server()->TickSpeed() * 0.2) {
+
+	if (HookedChar && HookedChar->GetPlayer()->GetTeam() != GetPlayer()->GetTeam() && Core()->m_HookTick > Server()->TickSpeed() * 0.2)
+	{
 		HookedChar->m_LastInteractTick = Server()->Tick();
 		HookedChar->m_LastEnemyInteractor = GetPlayer()->GetCID();
 	}
+
+	// Count hooks
+	if (m_Input.m_Hook && !m_PrevInput.m_Hook)
+		m_pPlayer->m_TotalHooks++;
 }
+
 bool CCharacter::Freeze(int seconds, bool IgnoreUnfreeze)
 {
 	m_IgnoreUnfreeze = IgnoreUnfreeze;
+
 	return Freeze(seconds);
 }
+
 bool CCharacter::UnFreeze(bool Force)
 {
 	if (Force)
-	{
 		m_IgnoreUnfreeze = false;
-	}
+
 	return UnFreeze();
 }

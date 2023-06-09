@@ -221,6 +221,14 @@ public:
 	bool m_VotedForPractice;
 	int m_SwapTargetsClientID; //Client ID of the swap target for the given player
 	bool m_BirthdayAnnounced;
+
+	// BNG
+	int m_HammerFires;
+	int m_HammerHittedFires;
+	int m_TotalFires;
+	int m_TotalHooks;
+	int m_Kills;
+	int m_Deaths;
 };
 
 #endif
