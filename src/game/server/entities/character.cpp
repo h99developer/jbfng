@@ -1303,7 +1303,7 @@ void CCharacter::HandleSkippableTiles(int Index)
 			}
 		}
 
-		if (m_LastEnemyInteractor != -1 && m_LastInteractTick + 5 * Server()->TickSpeed() >= Server()->Tick())
+		if (m_LastEnemyInteractor != -1 && GameServer()->m_apPlayers[m_LastEnemyInteractor] && m_LastInteractTick + 5 * Server()->TickSpeed() >= Server()->Tick())
 			Die(m_LastEnemyInteractor, WEAPON_NINJA, KillTile);
 		else
 			Die(m_pPlayer->GetCID(), WEAPON_WORLD, KillTile);
@@ -2370,6 +2370,7 @@ void CCharacter::EndSpree(int Killer)
 }
 void CCharacter::BNGTick()
 {
+	// handle killing tees that are in a freeze for too long
 	if (Core()->m_IsInFreeze)
 	{
 		m_TicksInFreeze++;
@@ -2381,6 +2382,13 @@ void CCharacter::BNGTick()
 	if (m_TicksInFreeze > 16 * Server()->TickSpeed())
 	{
 		Die(-1, WEAPON_WORLD);
+	}
+	// set interactor of hooked player to ourselves
+	int HookedPlayer = Core()->m_HookedPlayer;
+	CCharacter *HookedChar = GameServer()->GetPlayerChar(HookedPlayer);
+	if (HookedChar && HookedChar->GetPlayer()->GetTeam() != GetPlayer()->GetTeam() && Core()->m_HookTick > Server()->TickSpeed() * 0.2) {
+		HookedChar->m_LastInteractTick = Server()->Tick();
+		HookedChar->m_LastEnemyInteractor = GetPlayer()->GetCID();
 	}
 }
 bool CCharacter::Freeze(int seconds, bool IgnoreUnfreeze)
