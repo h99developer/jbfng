@@ -245,19 +245,22 @@ int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct C
 	{
 		const int VictimTeam = pVictim->GetPlayer()->GetTeam();
 		const bool VictimDeepFrozen = pVictim->m_FreezeTime > 3.5 * Server()->TickSpeed();
-		int Points = VictimDeepFrozen ? 10 : 5;
+		int Points = (VictimDeepFrozen ? 10 : 5) * ((Tile == TILE_GOLD_SPIKE) ? 2 : 1);
 		bool GivePoints = true;
 
 		// Handle team spikes
 		if((VictimTeam == TEAM_RED && Tile == TILE_RED_SPIKE) ||
 			(VictimTeam == TEAM_BLUE && Tile == TILE_BLUE_SPIKE))
 		{
+			if(pKiller->GetCharacter())
+				pKiller->GetCharacter()->Freeze(5);
+			GameServer()->SendBroadcast("Wrong spikes", pKiller->GetCID());
+			pKiller->m_Score -= 2;
+
 			GivePoints = false;
 		}
 		else
-		{
 			Points += 5;
-		}
 
 		// Add team score
 		if(GivePoints)

@@ -185,6 +185,7 @@ enum
 	// BNG
 	TILE_RED_SPIKE = 176,
 	TILE_BLUE_SPIKE,
+	TILE_GOLD_SPIKE,
 	//End of higher tiles
 	//Layers
 	LAYER_GAME = 0,
