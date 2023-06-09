@@ -4,6 +4,7 @@
 
 #include <game/server/gamecontroller.h>
 #include <game/server/teams.h>
+#include <game/mapitems.h>
 
 #include <map>
 #include <vector>
@@ -28,7 +29,7 @@ public:
 	void Tick() override;
 
 	void DoTeamChange(class CPlayer *pPlayer, int Team, bool DoChatMsg = true) override;
-	int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon) override;
+	int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon, int Tile = TILE_DEATH) override;
 
 	int64_t GetMaskForPlayerWorldEvent(int Asker, int ExceptID = -1) override;
 

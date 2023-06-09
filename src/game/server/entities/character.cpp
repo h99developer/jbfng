@@ -916,12 +916,12 @@ bool CCharacter::IncreaseArmor(int Amount)
 	return true;
 }
 
-void CCharacter::Die(int Killer, int Weapon)
+void CCharacter::Die(int Killer, int Weapon, int Tile)
 {
 	if(Server()->IsRecording(m_pPlayer->GetCID()))
 		Server()->StopRecord(m_pPlayer->GetCID());
 
-	int ModeSpecial = GameServer()->m_pController->OnCharacterDeath(this, GameServer()->m_apPlayers[Killer], Weapon);
+	int ModeSpecial = GameServer()->m_pController->OnCharacterDeath(this, GameServer()->m_apPlayers[Killer], Weapon, Tile);
 
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "kill killer='%d:%s' victim='%d:%s' weapon=%d special=%d",
@@ -1258,24 +1258,54 @@ void CCharacter::HandleBroadcast()
 
 void CCharacter::HandleSkippableTiles(int Index)
 {
-	// handle death-tiles and leaving gamelayer
-	if((Collision()->GetCollisionAt(m_Pos.x + GetProximityRadius() / 3.f, m_Pos.y - GetProximityRadius() / 3.f) == TILE_DEATH ||
-		   Collision()->GetCollisionAt(m_Pos.x + GetProximityRadius() / 3.f, m_Pos.y + GetProximityRadius() / 3.f) == TILE_DEATH ||
-		   Collision()->GetCollisionAt(m_Pos.x - GetProximityRadius() / 3.f, m_Pos.y - GetProximityRadius() / 3.f) == TILE_DEATH ||
-		   Collision()->GetCollisionAt(m_Pos.x - GetProximityRadius() / 3.f, m_Pos.y + GetProximityRadius() / 3.f) == TILE_DEATH ||
-		   Collision()->GetFCollisionAt(m_Pos.x + GetProximityRadius() / 3.f, m_Pos.y - GetProximityRadius() / 3.f) == TILE_DEATH ||
-		   Collision()->GetFCollisionAt(m_Pos.x + GetProximityRadius() / 3.f, m_Pos.y + GetProximityRadius() / 3.f) == TILE_DEATH ||
-		   Collision()->GetFCollisionAt(m_Pos.x - GetProximityRadius() / 3.f, m_Pos.y - GetProximityRadius() / 3.f) == TILE_DEATH ||
-		   Collision()->GetFCollisionAt(m_Pos.x - GetProximityRadius() / 3.f, m_Pos.y + GetProximityRadius() / 3.f) == TILE_DEATH) &&
-		!m_Core.m_Super && !(Team() && Teams()->TeeFinished(m_pPlayer->GetCID())))
+	// 0 - DDNet kill tile
+	// 1 - BNG red spike
+	// 2 - BNG blue spike
+	bool aKills[] = {false, false, false};
+	static const int s_aTiles[] = {TILE_DEATH, TILE_RED_SPIKE, TILE_BLUE_SPIKE};
+
+	for(int i = 0; i < std::size(aKills); i++)
 	{
+		const int Tile = s_aTiles[i];
+
+		if((Collision()->GetCollisionAt(m_Pos.x + GetProximityRadius() / 3.f, m_Pos.y - GetProximityRadius() / 3.f) == Tile ||
+			   Collision()->GetCollisionAt(m_Pos.x + GetProximityRadius() / 3.f, m_Pos.y + GetProximityRadius() / 3.f) == Tile ||
+			   Collision()->GetCollisionAt(m_Pos.x - GetProximityRadius() / 3.f, m_Pos.y - GetProximityRadius() / 3.f) == Tile ||
+			   Collision()->GetCollisionAt(m_Pos.x - GetProximityRadius() / 3.f, m_Pos.y + GetProximityRadius() / 3.f) == Tile ||
+			   Collision()->GetFCollisionAt(m_Pos.x + GetProximityRadius() / 3.f, m_Pos.y - GetProximityRadius() / 3.f) == Tile ||
+			   Collision()->GetFCollisionAt(m_Pos.x + GetProximityRadius() / 3.f, m_Pos.y + GetProximityRadius() / 3.f) == Tile ||
+			   Collision()->GetFCollisionAt(m_Pos.x - GetProximityRadius() / 3.f, m_Pos.y - GetProximityRadius() / 3.f) == Tile ||
+			   Collision()->GetFCollisionAt(m_Pos.x - GetProximityRadius() / 3.f, m_Pos.y + GetProximityRadius() / 3.f) == Tile) &&
+			!m_Core.m_Super && !(Team() && Teams()->TeeFinished(m_pPlayer->GetCID())))
+		{
+			aKills[i] = true;
+		}
+	}
+
+	// Handle kill tiles
+	if(aKills[0] || aKills[1] || aKills[2])
+	{
+		int KillTile;
+
+		// Get killed tile
+		for(int i = 0; i < std::size(aKills); i++)
+		{
+			if(aKills[i])
+			{
+				KillTile = s_aTiles[i];
+				break;
+			}
+		}
+
 		if (m_LastEnemyInteractor != -1 && m_LastInteractTick + 5 * Server()->TickSpeed() >= Server()->Tick())
-			Die(m_LastEnemyInteractor, WEAPON_NINJA);
+			Die(m_LastEnemyInteractor, WEAPON_NINJA, KillTile);
 		else
-			Die(m_pPlayer->GetCID(), WEAPON_WORLD);
+			Die(m_pPlayer->GetCID(), WEAPON_WORLD, KillTile);
+
 		return;
 	}
 
+	// Handle bounds of game layer
 	if(GameLayerClipped(m_Pos))
 	{
 		Die(m_pPlayer->GetCID(), WEAPON_WORLD);

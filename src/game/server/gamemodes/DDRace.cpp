@@ -233,26 +233,44 @@ int CGameControllerDDRace::GetPlayerTeam(int ClientID) const
 {
 	return m_Teams.m_Core.Team(ClientID);
 }
-int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct CPlayer *pKiller, int Weapon)
+int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct CPlayer *pKiller, int Weapon, int Tile)
 {
 	if (Weapon == WEAPON_WORLD || Weapon == WEAPON_NINJA)
 	{
-		int points = pVictim->GetCore().m_DeepFrozen ? 10 : 5;
-		if (pVictim->GetPlayer()->GetTeam() == TEAM_RED)
-			m_aTeamscore[TEAM_BLUE] += points;
-		else
-			m_aTeamscore[TEAM_RED] += points;
-		if (pVictim->GetPlayer()->GetCID() != pKiller->GetCID())
+		const int VictimTeam = pVictim->GetPlayer()->GetTeam();
+		const bool VictimDeepFrozen = pVictim->Core()->m_DeepFrozen;
+		const int Points = VictimDeepFrozen ? 10 : 5;
+		bool GivePoints = true;
+
+		// Handle team spikes
+		if((VictimTeam == TEAM_RED && Tile == TILE_RED_SPIKE) ||
+			(VictimTeam == TEAM_BLUE && Tile == TILE_BLUE_SPIKE))
 		{
-			pKiller->m_Score += points / 5;
+			GivePoints = false;
+		}
+
+		// Add team score
+		if(GivePoints)
+		{
+			if(pVictim->GetPlayer()->GetTeam() == TEAM_RED)
+				m_aTeamscore[TEAM_BLUE] += Points;
+			else
+				m_aTeamscore[TEAM_RED] += Points;
+		}
+
+		// Handle killer score and killer spree
+		if(pVictim->GetPlayer()->GetCID() != pKiller->GetCID())
+		{
+			if(GivePoints)
+				pKiller->m_Score += Points / 5;
 			if(pKiller->GetCharacter())
-			{
 				pKiller->GetCharacter()->AddSpree();
-			}
 		}
 		else
 			pKiller->m_Score--;
+
 		pVictim->EndSpree(pKiller->GetCID());
 	}
+
 	return 0;
 }
