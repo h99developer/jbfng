@@ -480,7 +480,7 @@ void IGameController::EndRound()
 		if (!pPly)
 			continue;
 
-		const float KD = (float)pPly->m_Kills / (float)pPly->m_Deaths;
+		const float KD = (pPly->m_Deaths != 0) ? ((float)pPly->m_Kills / (float)pPly->m_Deaths) : 1.f;
 		if(KD > MaxKD)
 		{
 			MaxKD = KD;
