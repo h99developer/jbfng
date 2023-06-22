@@ -256,7 +256,7 @@ int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct C
 			pKiller->m_Score -= 2;
 			GivePoints = false;
 		}
-		else
+		else if (Tile == TILE_BLUE_SPIKE  || Tile == TILE_RED_SPIKE)
 			Points += 5;
 
 		// Add team score
@@ -278,7 +278,8 @@ int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct C
 		}
 		else
 			pKiller->m_Score--;
-
+		GameServer()->CreateSound(pVictim->m_Pos, SOUND_NINJA_HIT, INT64_MAX);
+		GameServer()->CreateSound(pKiller->m_ViewPos, SOUND_CTF_CAPTURE, 1 << pKiller->GetCID());
 		pVictim->EndSpree(pKiller->GetCID());
 	}
 
