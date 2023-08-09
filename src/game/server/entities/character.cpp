@@ -933,7 +933,7 @@ void CCharacter::Die(int Killer, int Weapon, int Tile)
 		Server()->StopRecord(m_pPlayer->GetCID());
 
 	CPlayer *pKiller = GameServer()->m_apPlayers[Killer];
-	const bool DontLosePoints = m_TicksInFreeze > 16 * Server()->TickSpeed();
+	const bool DontLosePoints = m_TicksInFreeze > 16 * Server()->TickSpeed() || m_LastEnemyInteractor == -1;
 	int ModeSpecial = GameServer()->m_pController->OnCharacterDeath(this, pKiller, Weapon, Tile, DontLosePoints);
 
 	if(Killer != m_pPlayer->GetCID())
@@ -2400,10 +2400,13 @@ void CCharacter::BNGTick()
 	int HookedPlayer = Core()->m_HookedPlayer;
 	CCharacter *HookedChar = GameServer()->GetPlayerChar(HookedPlayer);
 
-	if (HookedChar && HookedChar->GetPlayer()->GetTeam() != GetPlayer()->GetTeam() && Core()->m_HookTick > Server()->TickSpeed() * 0.2)
+	if (HookedChar && Core()->m_HookTick > Server()->TickSpeed() * 0.2)
 	{
 		HookedChar->m_LastInteractTick = Server()->Tick();
-		HookedChar->m_LastEnemyInteractor = GetPlayer()->GetCID();
+		if (HookedChar->GetPlayer()->GetTeam() != GetPlayer()->GetTeam())
+			HookedChar->m_LastEnemyInteractor = GetPlayer()->GetCID();
+		else
+			HookedChar->m_LastEnemyInteractor = -1;
 	}
 
 	// Count hooks

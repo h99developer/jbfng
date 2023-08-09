@@ -598,10 +598,16 @@ void IGameController::ChangeMap(const char *pToMap)
 void IGameController::OnReset()
 {
 	m_aTeamscore[0] = 0;
-    m_aTeamscore[1] = 0;
+    	m_aTeamscore[1] = 0;
 	for(auto &pPlayer : GameServer()->m_apPlayers)
+	{
 		if(pPlayer)
+		{
+			pPlayer->m_Score = 0;
 			pPlayer->Respawn();
+		}
+
+	}
 }
 
 int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon, int Tile, bool Force)
