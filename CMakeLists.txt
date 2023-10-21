@@ -162,7 +162,7 @@ else()
   )
 endif()
 
-set(SERVER_EXECUTABLE bng_srv CACHE STRING "Name of the built server executable")
+set(SERVER_EXECUTABLE srv CACHE STRING "Name of the built server executable")
 
 ########################################################################
 # Compiler flags

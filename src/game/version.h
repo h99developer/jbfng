@@ -9,9 +9,9 @@
 #define GAME_NETVERSION "0.6 626fce9a778df4d4"
 #define CLIENT_VERSIONNR 16060
 extern const char *GIT_SHORTREV_HASH;
-#define GAME_NAME "bng"
+#define GAME_NAME "jbfng"
 // DDNet-Skeleton
-#define GAME_MOD_NAME "bng"
+#define GAME_MOD_NAME "fng"
 #define GAME_MOD_RELEASE_VERSION "0.0.1"
 
 #define GAME_MOD_VERSION GAME_VERSION ", " GAME_MOD_RELEASE_VERSION

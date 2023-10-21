@@ -222,7 +222,7 @@ public:
 	int m_SwapTargetsClientID; //Client ID of the swap target for the given player
 	bool m_BirthdayAnnounced;
 
-	// BNG
+	// JBFNG
 	int m_HammerFires;
 	int m_HammerHittedFires;
 	int m_TotalFires;

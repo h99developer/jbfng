@@ -11,8 +11,10 @@
 #include <game/server/score.h>
 #include <game/version.h>
 
-#define GAME_TYPE_NAME "bng"
-#define TEST_TYPE_NAME "bng"
+
+
+#define GAME_TYPE_NAME "jbfng"
+#define TEST_TYPE_NAME "jbfng"
 
 CGameControllerDDRace::CGameControllerDDRace(class CGameContext *pGameServer) :
 	IGameController(pGameServer), m_Teams(pGameServer), m_pInitResult(nullptr)
@@ -247,17 +249,44 @@ int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct C
 		const int VictimTeam = pVictim->GetPlayer()->GetTeam();
 		const bool VictimDeepFrozen = pVictim->m_FreezeTime > 3.5 * Server()->TickSpeed();
 		int Points = (VictimDeepFrozen ? 10 : 5) * ((Tile == TILE_GOLD_SPIKE) ? 2 : 1);
+		int playerPoints = 0;
 		bool GivePoints = true;
 
+
 		// Handle team spikes
-		if((VictimTeam == TEAM_RED && Tile == TILE_RED_SPIKE) ||
+		if((VictimTeam == TEAM_RED && Tile == TILE_RED_SPIKE) || // Team Spikes
 			(VictimTeam == TEAM_BLUE && Tile == TILE_BLUE_SPIKE))
 		{
 			pKiller->m_Score -= 2;
+			pKiller->GetCharacter()->Freeze(3);
 			GivePoints = false;
 		}
-		else if (Tile == TILE_BLUE_SPIKE  || Tile == TILE_RED_SPIKE)
-			Points += 5;
+
+		else if (Tile == TILE_BLUE_SPIKE  || Tile == TILE_RED_SPIKE) { // team spikes
+			Points = 10;
+			playerPoints = 5;
+		}
+
+		else if (Tile == TILE_NORMAL_SPIKE) { // default spikes
+			Points = 5;
+			playerPoints = 3;
+		}
+
+		else if (Tile == TILE_GREEN_SPIKE) { // green spikes
+			Points = 12;
+			playerPoints = 6;
+		}
+
+		else if (Tile == TILE_GOLD_SPIKE) { // gold spikes
+			Points = 18;
+			playerPoints = 7;
+		}
+
+		else if (Tile == TILE_PURPLE_SPIKE) { // purple spikes
+			Points = 20;
+			playerPoints = 10;
+		}
+			
 
 		// Add team score
 		if(GivePoints)
@@ -272,7 +301,7 @@ int CGameControllerDDRace::OnCharacterDeath(struct CCharacter *pVictim, struct C
 		if(pVictim->GetPlayer()->GetCID() != pKiller->GetCID())
 		{
 			if(GivePoints)
-				pKiller->m_Score += Points / 5;
+				pKiller->m_Score += playerPoints;
 			if(pKiller->GetCharacter())
 				pKiller->GetCharacter()->AddSpree();
 		}

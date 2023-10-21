@@ -1,6 +1,6 @@
-# bng
+# jbfng
 
-teeworlds mod, heavily inspired by fng and block
+teeworlds mod, heavily inspired by fng
 
 
 freeze and sacrifice your enemies, save your teammates!

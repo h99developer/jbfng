@@ -624,6 +624,7 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 				pPlayer->m_SpectatorID = SPEC_FREEVIEW;
 		}
 	}
+
 }
 
 bool CPlayer::SetTimerType(int TimerType)

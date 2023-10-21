@@ -19,16 +19,14 @@ void CGameContext::ConCredits(IConsole::IResult *pResult, void *pUserData)
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp",
 		"DDNet is run by the DDNet staff (DDNet.org/staff)");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp",
-		"bng mod by k0rae (github.com/k0rae/bng)");
-	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp",
-		"report all bugs and suggestions to k0rae (tg: @xorebxebx, discord: k0rae#0408)");
+		"jbfng mod by Lil Tee");
 }
 
 void CGameContext::ConInfo(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp",
-		"bng.");
+		"jbfng.");
 	if(GIT_SHORTREV_HASH)
 	{
 		char aBuf[64];

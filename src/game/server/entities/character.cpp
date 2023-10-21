@@ -16,6 +16,7 @@
 #include <game/server/score.h>
 #include <game/server/teams.h>
 
+
 MACRO_ALLOC_POOL_ID_IMPL(CCharacter, MAX_CLIENTS)
 
 // Character, "physical" player's part
@@ -100,7 +101,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 
 	Server()->StartRecord(m_pPlayer->GetCID());
 
-	// bng
+	// jbfng
 	m_LastInteractTick = -1;
 	m_LastEnemyInteractor = -1;
 
@@ -242,7 +243,7 @@ void CCharacter::HandleNinja()
 
 	if(NinjaTime % Server()->TickSpeed() == 0 && NinjaTime / Server()->TickSpeed() <= 5)
 	{
-		GameServer()->CreateDamageInd(m_Pos, 0, NinjaTime / Server()->TickSpeed(), TeamMask() & GameServer()->ClientsMaskExcludeClientVersionAndHigher(VERSION_DDNET_NEW_HUD));
+		GameServer()->CreateDamageInd(m_Pos, 0, NinjaTime / Server()->TickSpeed(), TeamMask());
 	}
 
 	m_Armor = clamp(m_MaxArmor - (NinjaTime / 15), 0, m_MaxArmor);
@@ -789,7 +790,7 @@ void CCharacter::Tick()
 	HandleWeapons();
 
 	DDRacePostCoreTick();
-	BNGTick();
+	JBFNGTick();
 
 	// Previnput
 	m_PrevInput = m_Input;
@@ -1275,12 +1276,18 @@ void CCharacter::HandleBroadcast()
 
 void CCharacter::HandleSkippableTiles(int Index)
 {
+
 	// 0 - DDNet kill tile
-	// 1 - BNG red spike
-	// 2 - BNG blue spike
-	// 3 - BNG gold spike
-	bool aKills[] = {false, false, false, false};
-	static const int s_aTiles[] = {TILE_DEATH, TILE_RED_SPIKE, TILE_BLUE_SPIKE, TILE_GOLD_SPIKE};
+	// 23 - JBFNG red spike
+	// 24 - JBFNG blue spike
+	// 25 - JBFNG normal spike
+	// 26 - JBFNG gold spike
+	// 27 - JBFNG green spike
+	// 28 - JBFNG purple spike
+
+
+	bool aKills[] = {false, false, false, false, false, false, false};
+	static const int s_aTiles[] = {TILE_DEATH, TILE_RED_SPIKE, TILE_BLUE_SPIKE, TILE_GOLD_SPIKE, TILE_NORMAL_SPIKE, TILE_GREEN_SPIKE, TILE_PURPLE_SPIKE};
 
 	for(int i = 0; i < std::size(aKills); i++)
 	{
@@ -1303,6 +1310,7 @@ void CCharacter::HandleSkippableTiles(int Index)
 	// Handle kill tiles
 	int KillTile = -1;
 
+
 	for(int i = 0; i < std::size(aKills); i++)
 	{
 		if(aKills[i])
@@ -1312,12 +1320,13 @@ void CCharacter::HandleSkippableTiles(int Index)
 		}
 	}
 
+
 	if(KillTile != -1)
 	{
 		if (m_LastEnemyInteractor != -1 && GameServer()->m_apPlayers[m_LastEnemyInteractor] && m_LastInteractTick + 5 * Server()->TickSpeed() >= Server()->Tick())
 			Die(m_LastEnemyInteractor, WEAPON_NINJA, KillTile);
 		else
-			Die(m_pPlayer->GetCID(), WEAPON_WORLD, KillTile);
+			Die(m_pPlayer->GetCID(), WEAPON_WORLD, KillTile); // самый низ шипы
 
 		return;
 	}
@@ -1443,6 +1452,7 @@ void CCharacter::HandleTiles(int Index)
 		m_TeleCheckpoint = TeleCheckpoint;
 
 	GameServer()->m_pController->HandleCharacterTiles(this, Index);
+
 
 	// freeze
 	if(((m_TileIndex == TILE_FREEZE) || (m_TileFIndex == TILE_FREEZE)) && !m_Core.m_Super && !m_Core.m_DeepFrozen)
@@ -2026,8 +2036,9 @@ void CCharacter::DDRaceTick()
 	if(m_FreezeTime > 0 || m_FreezeTime == -1)
 	{
 		if(m_FreezeTime % Server()->TickSpeed() == Server()->TickSpeed() - 1 || m_FreezeTime == -1)
-		{
-			GameServer()->CreateDamageInd(m_Pos, 0, (m_FreezeTime + 1) / Server()->TickSpeed(), TeamMask() & GameServer()->ClientsMaskExcludeClientVersionAndHigher(VERSION_DDNET_NEW_HUD));
+		{	
+			int64_t TeamMask = Teams()->TeamMask(Team(), -1, GetID());
+			GameServer()->CreateDamageInd(m_Pos, 0, (m_FreezeTime + 1) / Server()->TickSpeed(), TeamMask);
 		}
 		if(m_FreezeTime > 0)
 			m_FreezeTime--;
@@ -2385,7 +2396,7 @@ void CCharacter::EndSpree(int Killer)
 	m_Spree = 0;
 }
 
-void CCharacter::BNGTick()
+void CCharacter::JBFNGTick()
 {
 	// handle killing tees that are in a freeze for too long
 	if (Core()->m_IsInFreeze)

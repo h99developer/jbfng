@@ -46,7 +46,7 @@ IGameController::IGameController(class CGameContext *pGameServer)
 
 	if(IsTeamplay())
 	{
-		dbg_msg("bng", "reset scores");
+		dbg_msg("jbfng", "reset scores");
 		m_aTeamscore[TEAM_RED] = m_aTeamscore[TEAM_BLUE] = 0;
 	}
 }
@@ -622,7 +622,7 @@ void IGameController::OnCharacterSpawn(class CCharacter *pChr)
 
 	// give default weapons
 	pChr->GiveWeapon(WEAPON_HAMMER);
-	pChr->GiveWeapon(WEAPON_GUN);
+	pChr->GiveWeapon(WEAPON_LASER);
 }
 
 void IGameController::HandleCharacterTiles(CCharacter *pChr, int MapIndex)

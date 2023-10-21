@@ -11,6 +11,8 @@
 #include <game/server/gamecontext.h>
 #include <game/server/gamemodes/DDRace.h>
 
+#include <game/server/player.h>
+
 CLaser::CLaser(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, float StartEnergy, int Owner, int Type) :
 	CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER)
 {
@@ -40,7 +42,7 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	vec2 At;
 	CCharacter *pOwnerChar = GameServer()->GetPlayerChar(m_Owner);
 	CCharacter *pHit;
-	bool pDontHitSelf = g_Config.m_SvOldLaser || (m_Bounces == 0 && !m_WasTele);
+	bool pDontHitSelf = g_Config.m_SvOldLaser || (!m_WasTele);
 
 	if(pOwnerChar ? (!pOwnerChar->LaserHitDisabled() && m_Type == WEAPON_LASER) || (!pOwnerChar->ShotgunHitDisabled() && m_Type == WEAPON_SHOTGUN) : g_Config.m_SvHit)
 		pHit = GameServer()->m_World.IntersectCharacter(m_Pos, To, 0.f, At, pDontHitSelf ? pOwnerChar : 0, m_Owner);
@@ -92,9 +94,16 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 			pHit->Core()->m_Vel = ClampVel(pHit->m_MoveRestrictions, pHit->Core()->m_Vel);
 		}
 	}
-	else if(m_Type == WEAPON_LASER)
+
+	else if (m_Type == WEAPON_LASER && pDontHitSelf == true && pHit->m_FreezeTime == 0)
 	{
-		pHit->UnFreeze();
+		int pHitTeam = pHit->GetPlayer()->GetTeam();
+		int pOwnerCharTeam = pOwnerChar->GetPlayer()->GetTeam();
+
+		if (pHitTeam != pOwnerCharTeam)
+		{
+			pHit->Freeze();
+		}
 	}
 	return true;
 }
@@ -127,7 +136,8 @@ void CLaser::DoBounce()
 
 	if(Res)
 	{
-		if(!HitCharacter(m_Pos, To))
+		bool resultHit = HitCharacter(m_Pos, To);
+		if(!resultHit)
 		{
 			// intersected
 			m_From = m_Pos;
@@ -187,7 +197,7 @@ void CLaser::DoBounce()
 				m_Energy = -1;
 
 			GameServer()->CreateSound(m_Pos, SOUND_LASER_BOUNCE, m_TeamMask);
-		}
+		} 
 	}
 	else
 	{
@@ -210,16 +220,19 @@ void CLaser::DoBounce()
 		bool pDontHitSelf = g_Config.m_SvOldLaser || (m_Bounces == 0 && !m_WasTele);
 		vec2 At;
 		CCharacter *pHit;
-		if(pOwnerChar ? (!pOwnerChar->LaserHitDisabled() && m_Type == WEAPON_LASER) : g_Config.m_SvHit)
+		if(pOwnerChar ? (!pOwnerChar->LaserHitDisabled() && m_Type == WEAPON_LASER) : g_Config.m_SvHit) {
 			pHit = GameServer()->m_World.IntersectCharacter(m_Pos, To, 0.f, At, pDontHitSelf ? pOwnerChar : 0, m_Owner);
-		else
+		}
+		else {
 			pHit = GameServer()->m_World.IntersectCharacter(m_Pos, To, 0.f, At, pDontHitSelf ? pOwnerChar : 0, m_Owner, pOwnerChar);
-
-		if(pHit)
+		}
+		if(pHit) {
 			Found = GetNearestAirPosPlayer(pHit->m_Pos, &PossiblePos);
-		else
+		}
+		else {
+			pHit->Freeze();
 			Found = GetNearestAirPos(m_Pos, m_From, &PossiblePos);
-
+		}
 		if(Found)
 		{
 			pOwnerChar->m_TeleGunPos = PossiblePos;

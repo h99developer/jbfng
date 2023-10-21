@@ -31,8 +31,8 @@ enum
 enum
 {
 	TEAM_SPECTATORS=-1,
-	TEAM_RED,
-	TEAM_BLUE,
+	TEAM_RED = 0,
+	TEAM_BLUE = 1,
 	NUM_TEAMS,
 
 	FLAG_MISSING=-3,

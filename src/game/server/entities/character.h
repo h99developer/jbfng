@@ -217,7 +217,7 @@ public:
 	int m_MaxHealth;
 	int m_MaxArmor;
 
-	// bng
+	// jbfng
 	int m_LastEnemyInteractor;
 	int m_LastInteractTick;
 	int m_Spree;
@@ -255,10 +255,10 @@ public:
 	bool IsSuper() { return m_Core.m_Super; }
 
 	CSaveTee &GetRescueTeeRef() { return m_RescueTee; }
-	// bng
+	// jbfng
 	void AddSpree();
 	void EndSpree(int Killer);
-	void BNGTick();
+	void JBFNGTick();
 	bool m_IgnoreUnfreeze;
 	bool Freeze(int seconds, bool IgnoreUnfreeze);
 	bool UnFreeze(bool Force);
