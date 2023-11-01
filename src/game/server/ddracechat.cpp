@@ -7,8 +7,27 @@
 #include <game/version.h>
 
 #include "entities/character.h"
-#include "player.h"
 #include "score.h"
+
+#include "teams.h"
+#include "entities/character.h"
+#include "gamecontroller.h"
+#include "./player.h"
+#include "score.h"
+#include "teehistorian.h"
+
+#include <engine/shared/config.h>
+
+#include <game/mapitems.h>
+
+#include "database/database.h"
+
+#include <iostream>
+
+using namespace std;
+
+using namespace basepsql;
+
 
 bool CheckClientID(int ClientID);
 
@@ -42,6 +61,92 @@ void CGameContext::ConInfo(IConsole::IResult *pResult, void *pUserData)
 	// pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp",
 	// 	"Or visit DDNet.tw");
 }
+
+
+void CGameContext::ConRegister(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int ClientID = pResult->m_ClientID;
+
+	if (pResult->NumArguments() > 1)
+	{
+		Postgres::User user;
+		user.Login = pResult->GetString(0);
+
+
+		bool result = user.registration(pResult->GetString(1), "0.0.0.0");
+
+		if (result) {
+			
+			CPlayer *pPlayer = pSelf->m_apPlayers[ClientID];
+			pPlayer->SetAuth(pResult->GetString(0));
+			pPlayer->SetAuthStatus(true);
+
+		
+			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp", "✓ You have successfully registered on the server!");
+		} else {
+			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp", "✗ Failed to register. Your login may already be in use.");
+		}
+		
+	} else {
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp", "/register [login] [password]");
+	}
+}
+
+void CGameContext::ConLogin(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int ClientID = pResult->m_ClientID;
+	CPlayer *pPlayer = pSelf->m_apPlayers[ClientID];
+
+	if (pPlayer->GetAuthStatus() == true)
+	{
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp", "✗ You are already logged into the server, use /logout to log out of your account");
+	} 
+	else 
+	{
+		if (pResult->NumArguments() > 1) {
+			Postgres::User user;
+			user.Login = pResult->GetString(0);
+			std::string Password = pResult->GetString(1);
+			bool logInResult = user.login(Password);
+
+			std::cout << logInResult << std::endl;
+
+			if (logInResult == true) {
+				pPlayer->SetAuth(pResult->GetString(0));
+				pPlayer->SetAuthStatus(true);
+
+				pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp", "✓ You have successfully logged into your account on the server");
+			}
+			else {
+				pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp", "✗ Wrong password or login!");
+			}
+		} else {
+			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp", "/login [login] [password]");
+		}
+	}
+}
+
+void CGameContext::ConLogoutAccount(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int ClientID = pResult->m_ClientID;
+	CPlayer *pPlayer = pSelf->m_apPlayers[ClientID];
+
+	bool authStatus = pPlayer->GetAuthStatus();
+
+	if (authStatus == true) {
+		pPlayer->SetAuthStatus(false);
+		pPlayer->SetAuth("");
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp", "✓ You have successfully logout");
+	} else {
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "chatresp", "✗ You are not authorized in your account");
+	}
+
+}
+
+
 
 void CGameContext::ConList(IConsole::IResult *pResult, void *pUserData)
 {

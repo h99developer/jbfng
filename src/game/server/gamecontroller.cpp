@@ -11,6 +11,7 @@
 #include "gamecontroller.h"
 #include "player.h"
 
+
 #include "entities/character.h"
 #include "entities/door.h"
 #include "entities/dragger.h"
@@ -18,6 +19,7 @@
 #include "entities/light.h"
 #include "entities/pickup.h"
 #include "entities/projectile.h"
+
 
 IGameController::IGameController(class CGameContext *pGameServer)
 {
@@ -421,14 +423,15 @@ void IGameController::OnPlayerConnect(CPlayer *pPlayer)
 	int ClientID = pPlayer->GetCID();
 	pPlayer->Respawn();
 
+
 	if(!Server()->ClientPrevIngame(ClientID))
 	{
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' team=%d", ClientID, Server()->ClientName(ClientID), pPlayer->GetTeam());
+		str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' team=%d client version=%d", ClientID, Server()->ClientName(ClientID), pPlayer->GetTeam(), pPlayer->GetClientVersion());
 		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 
 		// DDNet-Skeleton
-		str_format(aBuf, sizeof(aBuf), "'%s' entered and joined the %s", Server()->ClientName(ClientID), GetTeamName(pPlayer->GetTeam()));
+		str_format(aBuf, sizeof(aBuf), "'%s' entered and joined the %s with client version: %d", Server()->ClientName(ClientID), GetTeamName(pPlayer->GetTeam()), pPlayer->GetClientVersion());
 		GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf, -1, CGameContext::CHAT_SIX);
 
 		GameServer()->SendChatTarget(ClientID, GAME_MOD_NAME " Version: " GAME_MOD_VERSION);

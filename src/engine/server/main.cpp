@@ -21,6 +21,8 @@
 
 #include <vector>
 
+#include "../src/engine/server/FNGStorage/fngstorage.h"
+
 #if defined(CONF_FAMILY_WINDOWS)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -34,6 +36,10 @@ bool IsInterrupted()
 {
 	return InterruptSignaled;
 }
+
+FNGStorage storage;
+
+FNGStorage getStorage() {return storage;}
 
 void HandleSigIntTerm(int Param)
 {
@@ -101,6 +107,7 @@ int main(int argc, const char **argv)
 #endif
 
 	CServer *pServer = CreateServer();
+	// storage.setServer(*pServer);
 	IKernel *pKernel = IKernel::Create();
 
 	// create the components

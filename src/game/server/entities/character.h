@@ -31,6 +31,7 @@ public:
 	CCharacter(CGameWorld *pWorld, CNetObj_PlayerInput LastInput);
 
 	void Reset() override;
+	bool GetAuthStatus();
 	void Destroy() override;
 	void PreTick();
 	void Tick() override;

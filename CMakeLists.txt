@@ -962,6 +962,7 @@ if(SERVER)
     databases/connection_pool.h
     databases/mysql.cpp
     databases/sqlite.cpp
+    FNGStorage/fngstorage.cpp
     main.cpp
     name_ban.cpp
     name_ban.h
@@ -991,6 +992,7 @@ if(SERVER)
     entities/gun.cpp
     entities/gun.h
     entities/laser.cpp
+    database/database.cpp
     entities/laser.h
     entities/light.cpp
     entities/light.h
@@ -1485,3 +1487,4 @@ foreach(target ${TARGETS_DEP})
     target_compile_options(${target} PRIVATE ${OUR_FLAGS_DEP})
   endif()
 endforeach()
+target_link_libraries(${TARGET_SERVER} -lpqxx -lpq)

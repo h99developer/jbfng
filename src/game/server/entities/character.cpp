@@ -16,6 +16,9 @@
 #include <game/server/score.h>
 #include <game/server/teams.h>
 
+#include <iostream>
+using namespace std;
+
 
 MACRO_ALLOC_POOL_ID_IMPL(CCharacter, MAX_CLIENTS)
 
@@ -106,6 +109,11 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_LastEnemyInteractor = -1;
 
 	return true;
+}
+
+bool CCharacter::GetAuthStatus()
+{
+	return m_pPlayer->GetAuthStatus();
 }
 
 void CCharacter::Destroy()
@@ -2022,6 +2030,7 @@ void CCharacter::SetRescue()
 
 void CCharacter::DDRaceTick()
 {
+
 	mem_copy(&m_Input, &m_SavedInput, sizeof(m_Input));
 	m_Armor = (m_FreezeTime >= 0) ? m_MaxArmor - (m_FreezeTime / 15) : 0;
 	if(m_Input.m_Direction != 0 || m_Input.m_Jump != 0)
@@ -2033,11 +2042,18 @@ void CCharacter::DDRaceTick()
 		m_Input.m_Jump = 0;
 		// Hook is possible in live freeze
 	}
+
+	// if (m_Core.m_Super)
+	// {
+	// 	GameServer()->CreateDonaterStar(m_Pos, 800, 1, TeamMask());
+	// }
+
 	if(m_FreezeTime > 0 || m_FreezeTime == -1)
 	{
 		if(m_FreezeTime % Server()->TickSpeed() == Server()->TickSpeed() - 1 || m_FreezeTime == -1)
 		{	
-			int64_t TeamMask = Teams()->TeamMask(Team(), -1, GetID());
+			int64_t TeamMask = Teams()->GetTeamMask(m_pPlayer->GetTeam());
+			std::cout << TeamMask << std::endl;
 			GameServer()->CreateDamageInd(m_Pos, 0, (m_FreezeTime + 1) / Server()->TickSpeed(), TeamMask);
 		}
 		if(m_FreezeTime > 0)

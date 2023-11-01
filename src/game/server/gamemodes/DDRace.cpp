@@ -126,6 +126,8 @@ void CGameControllerDDRace::HandleCharacterTiles(CCharacter *pChr, int MapIndex)
 
 void CGameControllerDDRace::OnPlayerConnect(CPlayer *pPlayer)
 {
+
+
 	IGameController::OnPlayerConnect(pPlayer);
 	int ClientID = pPlayer->GetCID();
 

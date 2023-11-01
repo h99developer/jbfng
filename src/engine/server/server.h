@@ -181,6 +181,8 @@ public:
 		int m_Country;
 		int m_Score;
 		int m_Authed;
+		int m_Auth;
+		int m_AuthStatus;
 		int m_AuthKey;
 		int m_AuthTries;
 		int m_NextMapChunk;

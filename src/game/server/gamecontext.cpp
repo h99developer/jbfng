@@ -206,6 +206,26 @@ void CGameContext::CreateDamageInd(vec2 Pos, float Angle, int Amount, int64_t Ma
 	}
 }
 
+void CGameContext::CreateDonaterStar(vec2 Pos, float Angle, int Amount, int64_t Mask)
+{
+	float a = 3 * pi / 2 + Angle;
+	//float a = get_angle(dir);
+	float s = a - pi / 3;
+	float e = a + pi / 3;
+	bool status = false;
+	for(int i = 0; i < Amount; i++)
+	{
+		float f = mix(s, e, (i + 1) / (float)(Amount + 2));
+		CNetEvent_DamageInd *pEvent = (CNetEvent_DamageInd *)m_Events.Create(NETEVENTTYPE_DAMAGEIND, sizeof(CNetEvent_DamageInd), Mask);
+		if(pEvent)
+		{
+			pEvent->m_X = (int)Pos.x;
+			pEvent->m_Y = (int)Pos.y;
+			pEvent->m_Angle = (int)(f * 256.0f);
+		}
+	}
+}
+
 void CGameContext::CreateHammerHit(vec2 Pos, int64_t Mask)
 {
 	// create the event

@@ -97,6 +97,7 @@ public:
 	void ChangeTeamState(int Team, int State);
 
 	int64_t TeamMask(int Team, int ExceptID = -1, int Asker = -1);
+	int64_t GetTeamMask(int Team);
 
 	int Count(int Team) const;
 

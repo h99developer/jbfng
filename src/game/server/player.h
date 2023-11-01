@@ -11,6 +11,8 @@
 #include "teeinfo.h"
 
 #include <memory>
+#include <iostream>
+#include <string>
 
 class CCharacter;
 class CGameContext;
@@ -42,6 +44,10 @@ public:
 	void SetTeam(int Team, bool DoChatMsg = true);
 	int GetTeam() const { return m_Team; }
 	int GetCID() const { return m_ClientID; }
+	std::string GetAuth() const { return m_Auth; }
+	bool GetAuthStatus() { return m_AuthStatus; }
+	bool SetAuth(std::string Auth) {m_Auth = Auth; return true;}
+	bool SetAuthStatus(bool status) {m_AuthStatus = status; return true;}
 	uint32_t GetUniqueCID() const { return m_UniqueClientID; }
 	int GetClientVersion() const;
 	bool SetTimerType(int TimerType);
@@ -139,6 +145,9 @@ private:
 	bool m_WeakHookSpawn;
 	int m_ClientID;
 	int m_Team;
+
+	std::string m_Auth;
+	bool m_AuthStatus;
 
 	int m_Paused;
 	int64_t m_ForcePauseTime;

@@ -5,6 +5,7 @@
 #include "player.h"
 #include "score.h"
 #include "teehistorian.h"
+#include <iostream>
 
 #include <engine/shared/config.h>
 
@@ -471,6 +472,18 @@ bool CGameTeams::TeamFinished(int Team)
 		if(m_Core.Team(i) == Team && !m_aTeeFinished[i])
 			return false;
 	return true;
+}
+
+int64_t CGameTeams::GetTeamMask(int Team) {
+	int64_t Mask = 0;
+	for(int i = 0; i < MAX_CLIENTS; ++i) {
+		if (GetPlayer(i))
+		{
+			if (GetPlayer(i)->GetTeam() == Team || GetPlayer(i)->GetTeam() == TEAM_SPECTATORS) {
+				Mask |= 1LL << i;
+			}
+		}
+	}
 }
 
 int64_t CGameTeams::TeamMask(int Team, int ExceptID, int Asker)

@@ -202,6 +202,7 @@ public:
 
 	// helper functions
 	void CreateDamageInd(vec2 Pos, float AngleMod, int Amount, int64_t Mask = -1);
+	void CreateDonaterStar(vec2 Pos, float AngleMod, int Amount, int64_t Mask = -1);
 	void CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamage, int ActivatedTeam, int64_t Mask);
 	void CreateHammerHit(vec2 Pos, int64_t Mask = -1);
 	void CreatePlayerSpawn(vec2 Pos, int64_t Mask = -1);
@@ -353,6 +354,9 @@ private:
 
 	static void ConCredits(IConsole::IResult *pResult, void *pUserData);
 	static void ConInfo(IConsole::IResult *pResult, void *pUserData);
+	static void ConRegister(IConsole::IResult *pResult, void *pUserData);
+	static void ConLogin(IConsole::IResult *pResult, void *pUserData);
+	static void ConLogoutAccount(IConsole::IResult *pResult, void *pUserData);
 	static void ConHelp(IConsole::IResult *pResult, void *pUserData);
 	static void ConSettings(IConsole::IResult *pResult, void *pUserData);
 	static void ConRules(IConsole::IResult *pResult, void *pUserData);

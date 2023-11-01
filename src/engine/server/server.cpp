@@ -42,6 +42,9 @@
 #include "databases/connection_pool.h"
 #include "register.h"
 
+#include "game/server/player.h"
+
+
 extern bool IsInterrupted();
 
 CSnapIDPool::CSnapIDPool()
@@ -1358,6 +1361,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 	CUnpacker Unpacker;
 	Unpacker.Reset(pPacket->m_pData, pPacket->m_DataSize);
 	CMsgPacker Packer(NETMSG_EX, true);
+
 
 	// unpack msgid and system flag
 	int Msg;
@@ -2920,6 +2924,7 @@ void CServer::ConStatus(IConsole::IResult *pResult, void *pUser)
 				str_format(aDnsblStr, sizeof(aDnsblStr), " dnsbl=%s", pDnsblStr);
 			}
 
+
 			char aAuthStr[128];
 			aAuthStr[0] = '\0';
 			if(pThis->m_aClients[i].m_AuthKey >= 0)
@@ -2931,14 +2936,21 @@ void CServer::ConStatus(IConsole::IResult *pResult, void *pUser)
 				str_format(aAuthStr, sizeof(aAuthStr), " key=%s %s", pThis->m_AuthManager.KeyIdent(pThis->m_aClients[i].m_AuthKey), pAuthStr);
 			}
 
+			bool authStatus = pThis->m_aClients[i].m_AuthStatus;
+			char aAuthStatus[128];
+			aAuthStatus[0] = '\0';
+			str_format(aAuthStatus, sizeof(aAuthStatus), "%d", authStatus);
+			
+
+
 			const char *pClientPrefix = "";
 			if(pThis->m_aClients[i].m_Sixup)
 			{
 				pClientPrefix = "0.7:";
 			}
-			str_format(aBuf, sizeof(aBuf), "id=%d addr=<{%s}> name='%s' client=%s%d secure=%s flags=%d%s%s",
+			str_format(aBuf, sizeof(aBuf), "id=%d addr=<{%s}> name='%s' client=%s%d secure=%s flags=%d%s%s authed=%d",
 				i, aAddrStr, pThis->m_aClients[i].m_aName, pClientPrefix, pThis->m_aClients[i].m_DDNetVersion,
-				pThis->m_NetServer.HasSecurityToken(i) ? "yes" : "no", pThis->m_aClients[i].m_Flags, aDnsblStr, aAuthStr);
+				pThis->m_NetServer.HasSecurityToken(i) ? "yes" : "no", pThis->m_aClients[i].m_Flags, aDnsblStr, aAuthStr, pThis->m_aClients[i].m_AuthStatus);
 		}
 		else
 		{
@@ -2947,6 +2959,8 @@ void CServer::ConStatus(IConsole::IResult *pResult, void *pUser)
 		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 	}
 }
+
+
 
 static int GetAuthLevel(const char *pLevel)
 {
@@ -3544,6 +3558,9 @@ void CServer::ConchainRconPasswordChangeGeneric(int Level, const char *pCurrent,
 		}
 	}
 }
+
+// ДОПИСАТЬ АВТОРИЗАЦИЮ / РЕГИСТРАЦИЮ
+
 
 void CServer::ConchainRconPasswordChange(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
 {
